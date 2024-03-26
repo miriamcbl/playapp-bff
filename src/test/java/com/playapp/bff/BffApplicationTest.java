@@ -17,7 +17,7 @@ class BffApplicationTest {
 
 	@Test
 	void contextLoads() {
-		// Verifica que la aplicación se cargue correctamente
+		// Comprueba que el arranque del micro sea correcto
 		assertNotNull(bffApplication);
 	}
 
