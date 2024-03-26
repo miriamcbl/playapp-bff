@@ -25,6 +25,7 @@ class AIChatControllerTest {
 		ReflectionTestUtils.setField(aiChatController, "chatClient", chatClient);
 		String message = "This is a test message";
 		String expectedResult = "This is a test response";
+		// mockeamos el metodo call, para que devuelva el mensaje de la linea anterior
 		when(chatClient.call(anyString())).thenReturn(expectedResult);
 		assertNotNull(aiChatController.generate(message));
 	}
