@@ -12,7 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @WebMvcTest(AIChatController.class)
-public class AIChatControllerTest {
+class AIChatControllerTest {
 
 	@MockBean
 	private OpenAiChatClient chatClient;
@@ -21,7 +21,7 @@ public class AIChatControllerTest {
 	private AIChatController aiChatController;
 
 	@Test
-	public void generateTest() throws Exception {
+	void generateTest() throws Exception {
 		ReflectionTestUtils.setField(aiChatController, "chatClient", chatClient);
 		String message = "This is a test message";
 		String expectedResult = "This is a test response";
