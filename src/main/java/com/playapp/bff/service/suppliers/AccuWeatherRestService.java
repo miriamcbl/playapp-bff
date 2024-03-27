@@ -1,8 +1,5 @@
 package com.playapp.bff.service.suppliers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,19 +13,20 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AccuWeatherRestService extends WebClientService {
 
-	@Value("${env.accuweather.apikey}")
+
 	private String accuWeatherApiKey;
 
 	public AccuWeatherRestService(WebClient.Builder webClientBuilder,
-			@Value("${env.accuweather-day.rest}") String url) {
+			@Value("${env.accuweather-day.rest}") String url,
+			@Value("${env.accuweather.apikey}") String accuWeatherApiKey) {
 		super(webClientBuilder, url);
+		this.accuWeatherApiKey = accuWeatherApiKey;
 	}
 
 	public WeatherDetails getDetails() {
 		log.info("Begin - getDetails");
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
 				url + "/2327930");
-		Map<String, String> queryParams = new HashMap<>();
 		builder.queryParam("apikey", accuWeatherApiKey);
 		builder.queryParam("language", "es-es");
 		builder.queryParam("details", "true");

@@ -11,11 +11,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.playapp.bff.service.suppliers.AccuWeatherRestService;
+
 @WebMvcTest(AIChatController.class)
 class AIChatControllerTest {
 
 	@MockBean
 	private OpenAiChatClient chatClient;
+
+	@MockBean
+	private AccuWeatherRestService accuweatherRestService;
 
 	@InjectMocks
 	private AIChatController aiChatController;
