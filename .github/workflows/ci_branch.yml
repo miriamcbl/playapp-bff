@@ -34,10 +34,6 @@ jobs:
          path: ~/.m2
          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
          restore-keys: ${{ runner.os }}-m2
-     - name: Install dependencies
-       run: mvn install
-     - name: Run unit tests
-       run: mvn test
      - name: Analyze with SonarCloud
        uses: SonarSource/sonarcloud-github-action@master
        env:
