@@ -17,6 +17,8 @@
 	<properties>
 		<java.version>22</java.version>
 		<spring-ai.version>0.8.1</spring-ai.version>
+		<sonar.organization>playapp</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
 		<dependency>
