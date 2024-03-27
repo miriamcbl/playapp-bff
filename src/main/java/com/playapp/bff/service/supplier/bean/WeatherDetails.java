@@ -1,4 +1,6 @@
-package com.playapp.bff.service.suppliers.beans;
+package com.playapp.bff.service.supplier.bean;
+
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,9 +15,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RealFeelTemperature {
-	@JsonProperty("Minimun")
-	private Measurement minimum;
-	@JsonProperty("Maximum")
-	private Measurement maximum;
+public class WeatherDetails {
+	@JsonProperty("DailyForecasts")
+	private List<DailyForecast> dailyForecasts;
 }

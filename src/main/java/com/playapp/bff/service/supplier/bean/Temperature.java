@@ -1,4 +1,4 @@
-package com.playapp.bff.service.suppliers.beans;
+package com.playapp.bff.service.supplier.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

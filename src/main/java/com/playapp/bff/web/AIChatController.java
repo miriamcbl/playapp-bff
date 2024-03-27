@@ -1,5 +1,7 @@
 package com.playapp.bff.web;
 
+import java.util.List;
+
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -9,8 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.playapp.bff.service.suppliers.AccuWeatherRestService;
-import com.playapp.bff.service.suppliers.beans.WeatherDetails;
+import com.playapp.bff.bean.LocationKey;
+import com.playapp.bff.service.WeatherService;
+import com.playapp.bff.service.supplier.AccuWeatherRestService;
+import com.playapp.bff.service.supplier.bean.LocationResponse;
+import com.playapp.bff.service.supplier.bean.WeatherDetails;
 
 import reactor.core.publisher.Flux;
 
@@ -26,16 +31,22 @@ public class AIChatController {
 	/** The rest service. */
 	private AccuWeatherRestService restService;
 
+	/** The weather service. */
+	private WeatherService weatherService;
+
 	/**
 	 * Instantiates a new AI chat controller.
 	 *
-	 * @param chatClient  the chat client
-	 * @param restService the rest service
+	 * @param chatClient     the chat client
+	 * @param restService    the rest service
+	 * @param weatherService the weather service
 	 */
     @Autowired
-	public AIChatController(OpenAiChatClient chatClient, AccuWeatherRestService restService) {
+	public AIChatController(OpenAiChatClient chatClient, AccuWeatherRestService restService,
+			WeatherService weatherService) {
         this.chatClient = chatClient;
 		this.restService = restService;
+		this.weatherService = weatherService;
     }
 
 	/**
@@ -70,6 +81,9 @@ public class AIChatController {
 	 */
 	@GetMapping("/ai/getDetails")
 	public WeatherDetails getWeatherDetails() {
-		return restService.getDetails();
+		WeatherDetails weather = restService.getDetails();
+		LocationResponse response = restService.getLocations("36.307690", "-6.151309");
+		List<LocationKey> myMap = weatherService.getWeatherDetails();
+		return weather;
 	}
 }

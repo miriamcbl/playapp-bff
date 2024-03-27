@@ -1,4 +1,4 @@
-package com.playapp.bff.service.suppliers;
+package com.playapp.bff.service.supplier;
 
 import org.springframework.web.reactive.function.client.WebClient;
 

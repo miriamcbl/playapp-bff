@@ -1,4 +1,4 @@
-package com.playapp.bff.service.suppliers.beans;
+package com.playapp.bff.service.supplier.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,11 +13,9 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Measurement {
-	@JsonProperty("Value")
-	private double value;
-	@JsonProperty("Unit")
-	private String unit;
-	@JsonProperty("UnitType")
-	private int unitType;
+public class RealFeelTemperature {
+	@JsonProperty("Minimun")
+	private Measurement minimum;
+	@JsonProperty("Maximum")
+	private Measurement maximum;
 }

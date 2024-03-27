@@ -1,6 +1,4 @@
-package com.playapp.bff.service.suppliers.beans;
-
-import java.util.List;
+package com.playapp.bff.service.supplier.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +13,11 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeatherDetails {
-	@JsonProperty("DailyForecasts")
-	private List<DailyForecast> dailyForecasts;
+public class Measurement {
+	@JsonProperty("Value")
+	private double value;
+	@JsonProperty("Unit")
+	private String unit;
+	@JsonProperty("UnitType")
+	private int unitType;
 }
