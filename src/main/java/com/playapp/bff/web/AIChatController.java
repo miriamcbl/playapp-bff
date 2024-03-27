@@ -25,6 +25,12 @@ public class AIChatController {
 		return chatClient.call(message);
     }
 
+	/**
+	 * Generate a stream from prompts
+	 * 
+	 * @param message
+	 * @return
+	 */
 	@GetMapping("/ai/generateStream")
 	public Flux<ChatResponse> generateStream(
 			@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
