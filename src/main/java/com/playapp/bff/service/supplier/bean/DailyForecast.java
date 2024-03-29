@@ -8,19 +8,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * The Class DailyForecast.
+ */
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DailyForecast {
-	@JsonProperty("Date")
-	private String date;
 
-	@JsonProperty("EpochDate")
-	private long epochDate;
+	/** The temperature. */
 	@JsonProperty("Temperature")
 	private Temperature temperature;
+
+	/** The real feel temperature. */
 	@JsonProperty("RealFeelTemperature")
 	private RealFeelTemperature realFeelTemperature;
+
+	@JsonProperty("Day")
+	private DayDetails day;
 }

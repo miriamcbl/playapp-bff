@@ -10,12 +10,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * The Class WeatherDetailsResponse.
+ */
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeatherDetails {
+public class WeatherDetailsResponse {
+
+	/** The name cala. */
+	private String beachName;
+
+	/** The daily forecasts. */
 	@JsonProperty("DailyForecasts")
 	private List<DailyForecast> dailyForecasts;
 }

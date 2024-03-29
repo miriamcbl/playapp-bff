@@ -7,19 +7,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * The Class LocationKeys.
+ * The Class LocationCode.
  */
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LocationKey {
+public class LocationCode {
 
 	/** The name. */
 	private String name;
 
-	/** The key. */
-	private String key;
+	/** The code. */
+	private String code;
 
 }

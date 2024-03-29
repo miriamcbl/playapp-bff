@@ -6,7 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.playapp.bff.service.supplier.bean.LocationResponse;
-import com.playapp.bff.service.supplier.bean.WeatherDetails;
+import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,17 +39,17 @@ public class AccuWeatherRestService extends WebClientService {
 	 *
 	 * @return the details
 	 */
-	public WeatherDetails getDetails() {
+	public WeatherDetailsResponse getDetails(String locationCode) {
 		log.info("Begin - getDetails");
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
-				url + "/forecasts/v1/daily/1day/2327930");
+				url + "/forecasts/v1/daily/1day/" + locationCode);
 		builder.queryParam("apikey", accuWeatherApiKey);
 		builder.queryParam("language", "es-es");
 		builder.queryParam("details", "true");
 		builder.queryParam("metric", "true");
-		WeatherDetails weather = webClient.get().uri(builder.build().encode().toUriString())
+		WeatherDetailsResponse weather = webClient.get().uri(builder.build().encode().toUriString())
 				.retrieve()
-				.bodyToMono(WeatherDetails.class).block();
+				.bodyToMono(WeatherDetailsResponse.class).block();
 		log.info("End - getDetails - Response: {}", weather);
 		return weather;
 	}

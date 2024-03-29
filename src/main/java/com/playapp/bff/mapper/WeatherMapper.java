@@ -2,7 +2,7 @@ package com.playapp.bff.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.playapp.bff.bean.LocationKey;
+import com.playapp.bff.bean.LocationCode;
 
 /**
  * The Class WeatherMapper.
@@ -17,8 +17,8 @@ public class WeatherMapper {
 	 * @param key  the key
 	 * @return the location key
 	 */
-	public LocationKey mapToLocationKey(String name, String key) {
-		return LocationKey.builder().name(name).key(key).build();
+	public LocationCode mapToLocationCode(String name, String key) {
+		return LocationCode.builder().name(name).code(key).build();
 
 	}
 

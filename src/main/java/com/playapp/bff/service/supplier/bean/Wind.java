@@ -9,20 +9,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * The Class DayDetails.
+ * The Class Wind.
  */
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DayDetails {
+public class Wind {
 
-	/** The wind. */
-	@JsonProperty("Wind")
-	private Wind wind;
+	/** The speed. */
+	@JsonProperty("Speed")
+	private WindSpeed speed;
 
-	/** The wind gusts. */
-	@JsonProperty("WindGust")
-	private Wind windGust;
+	/** The direction. */
+	@JsonProperty("Direction")
+	private WindDirection direction;
 }
