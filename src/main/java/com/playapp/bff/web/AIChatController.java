@@ -81,6 +81,7 @@ public class AIChatController {
 	 */
 	@GetMapping("/ai/getDetails")
 	public WeatherDetailsResponse getWeatherDetails() {
+		weatherService.getInformationData();
 		WeatherDetailsResponse weather = restService.getDetails("2327930");
 		LocationResponse response = restService.getLocations("36.307690", "-6.151309");
 		List<LocationCode> myMap = weatherService.getLocationCodesByCoordinates();

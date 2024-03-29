@@ -2,6 +2,7 @@ package com.playapp.bff.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -78,9 +79,25 @@ public class WeatherService {
 			if (isLevante) {
 				// buscar entre las playas que tienen levante
 				// TODO evaluar las playas apropiadas para levante (ponerle notas a esas solo)
+				// me saco los nombres de las playas para levante
+				// busco entre todas las que tengan menor viento
+				// le pongo notas para elegir la mejor
 			} else {
 				// buscar en base a los km/h del viento
 				// TODO montar fórmula para evaluar las playas según los km/h
+				// es decir 1 elijo de weatherDetails las playas que tengan menor viento
+				Comparator<WeatherDetailsResponse> comparator = new Comparator<WeatherDetailsResponse>() {
+					@Override
+					public int compare(WeatherDetailsResponse firstWeather, WeatherDetailsResponse secondWeather) {
+						double viento1 = firstWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed()
+								.getValue();
+						double viento2 = secondWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed()
+								.getValue();
+						return Double.compare(viento1, viento2);
+					}
+				};
+				weatherDetails.sort(comparator);
+				// luego aplico la formula para sacarme las 3 mejores
 			}
 		}
 
