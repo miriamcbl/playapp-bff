@@ -95,27 +95,18 @@ public class WeatherService {
 				};
 
 				if (isLevante) {
-					// buscar entre las playas que tienen levante a true
-					// TODO evaluar las playas apropiadas para levante (ponerle notas a esas solo)
-					// me saco los nombres de las playas para levante
-					// busco entre todas las que tengan menor viento
-					// le pongo notas para elegir la mejor
 					List<GeographicCoordinates> levanteBeaches = Arrays.asList(GeographicCoordinates.values()).stream()
 							.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante()))
 							.collect(Collectors.toList());
 					List<WeatherDetailsResponse> weatherDetailsForLevanteBeaches = weatherDetails.stream()
 							.filter(weatherBeach -> levanteBeaches.stream()
 									.anyMatch(levanteBeach -> levanteBeach.name().equals(weatherBeach.getBeachName())))
-							.collect(Collectors.toList());
+							.toList();
 					weatherDetailsForLevanteBeaches.sort(comparator);
 					finalBeaches = weatherDetailsForLevanteBeaches.subList(0, 3);
 				} else {
-					// buscar en base a los km/h del viento
-					// TODO montar fórmula para evaluar las playas según los km/h
-					// es decir 1 elijo de weatherDetails las playas que tengan menor viento
 					weatherDetails.sort(comparator);
 					finalBeaches = weatherDetails.subList(0, 3);
-					// luego aplico la formula para sacarme las 3 mejores
 				}
 			}
 		}
