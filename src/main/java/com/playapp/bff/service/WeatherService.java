@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -97,7 +96,7 @@ public class WeatherService {
 				if (isLevante) {
 					List<GeographicCoordinates> levanteBeaches = Arrays.asList(GeographicCoordinates.values()).stream()
 							.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante()))
-							.collect(Collectors.toList());
+							.toList();
 					List<WeatherDetailsResponse> weatherDetailsForLevanteBeaches = weatherDetails.stream()
 							.filter(weatherBeach -> levanteBeaches.stream()
 									.anyMatch(levanteBeach -> levanteBeach.name().equals(weatherBeach.getBeachName())))
@@ -110,9 +109,7 @@ public class WeatherService {
 				}
 			}
 		}
-
 		return finalBeaches;
-
 	}
 
 
