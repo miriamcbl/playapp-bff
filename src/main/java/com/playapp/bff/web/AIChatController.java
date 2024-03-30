@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.playapp.bff.bean.LocationCode;
 import com.playapp.bff.service.WeatherService;
 import com.playapp.bff.service.supplier.AccuWeatherRestService;
-import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 
 import reactor.core.publisher.Flux;
@@ -80,11 +78,7 @@ public class AIChatController {
 	 * @return the weather details
 	 */
 	@GetMapping("/ai/getDetails")
-	public WeatherDetailsResponse getWeatherDetails() {
-		weatherService.getInformationData();
-		WeatherDetailsResponse weather = restService.getDetails("2327930");
-		LocationResponse response = restService.getLocations("36.307690", "-6.151309");
-		List<LocationCode> myMap = weatherService.getLocationCodesByCoordinates();
-		return weather;
+	public List<WeatherDetailsResponse> getWeatherDetails() {
+		return weatherService.getInformationData();
 	}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -64,28 +65,24 @@ public class WeatherService {
 		return weatherDetails;
 	}
 
-	public void getInformationData() {
-		// Listado con el código asociado a cada playa segun AccuWeather
-		List<LocationCode> locationCodes = getLocationCodesByCoordinates();
-		// Se obtiene el tiempo/viento asociado a cada código
-		List<WeatherDetailsResponse> weatherDetails = getBeachWeathers(locationCodes);
-		// 1. ¿Qué viento hace en cádiz hoy?
+	public List<WeatherDetailsResponse> getInformationData() {
+		List<WeatherDetailsResponse> finalBeaches = new ArrayList<>();
 		WeatherDetailsResponse weatherDetailsCadiz = accuWeatherRestService.getDetails("306727");
-		if (CollectionUtils.isNotEmpty(weatherDetails)) {
-			String windToday = weatherDetailsCadiz.getDailyForecasts().get(0).getDay().getWind().getDirection()
-					.getLocalized();
-			boolean isLevante = Arrays.stream(LevanteWind.values())
-					.anyMatch(wind -> wind.getShortName().equals(windToday));
-			if (isLevante) {
-				// buscar entre las playas que tienen levante
-				// TODO evaluar las playas apropiadas para levante (ponerle notas a esas solo)
-				// me saco los nombres de las playas para levante
-				// busco entre todas las que tengan menor viento
-				// le pongo notas para elegir la mejor
-			} else {
-				// buscar en base a los km/h del viento
-				// TODO montar fórmula para evaluar las playas según los km/h
-				// es decir 1 elijo de weatherDetails las playas que tengan menor viento
+		String directionWindToday = weatherDetailsCadiz.getDailyForecasts().get(0).getDay().getWind().getDirection()
+				.getLocalized();
+		double kmhWindToday = Math
+				.round(weatherDetailsCadiz.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue());
+		if (kmhWindToday > 30.0) {
+			return finalBeaches;
+		} else {
+			// Listado con el código asociado a cada playa segun AccuWeather
+			List<LocationCode> locationCodes = getLocationCodesByCoordinates();
+			// Se obtiene el tiempo/viento asociado a cada código
+			List<WeatherDetailsResponse> weatherDetails = getBeachWeathers(locationCodes);
+			if (CollectionUtils.isNotEmpty(weatherDetails)) {
+				boolean isLevante = Arrays.stream(LevanteWind.values())
+						.anyMatch(wind -> wind.getShortName().equals(directionWindToday));
+
 				Comparator<WeatherDetailsResponse> comparator = new Comparator<WeatherDetailsResponse>() {
 					@Override
 					public int compare(WeatherDetailsResponse firstWeather, WeatherDetailsResponse secondWeather) {
@@ -96,11 +93,34 @@ public class WeatherService {
 						return Double.compare(viento1, viento2);
 					}
 				};
-				weatherDetails.sort(comparator);
-				// luego aplico la formula para sacarme las 3 mejores
+
+				if (isLevante) {
+					// buscar entre las playas que tienen levante a true
+					// TODO evaluar las playas apropiadas para levante (ponerle notas a esas solo)
+					// me saco los nombres de las playas para levante
+					// busco entre todas las que tengan menor viento
+					// le pongo notas para elegir la mejor
+					List<GeographicCoordinates> levanteBeaches = Arrays.asList(GeographicCoordinates.values()).stream()
+							.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante()))
+							.collect(Collectors.toList());
+					List<WeatherDetailsResponse> weatherDetailsForLevanteBeaches = weatherDetails.stream()
+							.filter(weatherBeach -> levanteBeaches.stream()
+									.anyMatch(levanteBeach -> levanteBeach.name().equals(weatherBeach.getBeachName())))
+							.collect(Collectors.toList());
+					weatherDetailsForLevanteBeaches.sort(comparator);
+					finalBeaches = weatherDetailsForLevanteBeaches.subList(0, 3);
+				} else {
+					// buscar en base a los km/h del viento
+					// TODO montar fórmula para evaluar las playas según los km/h
+					// es decir 1 elijo de weatherDetails las playas que tengan menor viento
+					weatherDetails.sort(comparator);
+					finalBeaches = weatherDetails.subList(0, 3);
+					// luego aplico la formula para sacarme las 3 mejores
+				}
 			}
 		}
 
+		return finalBeaches;
 
 	}
 
