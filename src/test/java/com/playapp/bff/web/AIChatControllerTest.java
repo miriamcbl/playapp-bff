@@ -11,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.playapp.bff.service.supplier.AccuWeatherRestService;
+import com.playapp.bff.service.WeatherService;
 
 @WebMvcTest(AIChatController.class)
 class AIChatControllerTest {
@@ -20,7 +20,7 @@ class AIChatControllerTest {
 	private OpenAiChatClient chatClient;
 
 	@MockBean
-	private AccuWeatherRestService accuweatherRestService;
+	private WeatherService weatherService;
 
 	@InjectMocks
 	private AIChatController aiChatController;
@@ -34,15 +34,5 @@ class AIChatControllerTest {
 		when(chatClient.call(anyString())).thenReturn(expectedResult);
 		assertNotNull(aiChatController.generate(message));
 	}
-
-//	@Test
-//	public void generateStreamTest() throws Exception {
-//		ReflectionTestUtils.setField(aiChatController, "chatClient", chatClient);
-//		String message = "This is a test message";
-//		ChatResponse chatResponse = new ChatResponse(List.of(new Generation("respuesta")));
-//		Flux<ChatResponse> response = new Flux.just(chatResponse);
-//		when(chatClient.stream(any(Prompt.class))).thenReturn(response);
-//		assertNotNull(aiChatController.generateStream(message));
-//	}
 
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.playapp.bff.service.WeatherService;
-import com.playapp.bff.service.supplier.AccuWeatherRestService;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 
 import reactor.core.publisher.Flux;
@@ -26,9 +25,6 @@ public class AIChatController {
 	/** The chat client. */
     private final OpenAiChatClient chatClient;
 
-	/** The rest service. */
-	private AccuWeatherRestService restService;
-
 	/** The weather service. */
 	private WeatherService weatherService;
 
@@ -36,14 +32,12 @@ public class AIChatController {
 	 * Instantiates a new AI chat controller.
 	 *
 	 * @param chatClient     the chat client
-	 * @param restService    the rest service
 	 * @param weatherService the weather service
 	 */
     @Autowired
-	public AIChatController(OpenAiChatClient chatClient, AccuWeatherRestService restService,
+	public AIChatController(OpenAiChatClient chatClient,
 			WeatherService weatherService) {
         this.chatClient = chatClient;
-		this.restService = restService;
 		this.weatherService = weatherService;
     }
 
