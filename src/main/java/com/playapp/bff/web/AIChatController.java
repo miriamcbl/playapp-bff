@@ -26,7 +26,7 @@ public class AIChatController {
     }
 
 	/**
-	 * Generate a stream from promptsss
+	 * Generate a stream from prompts
 	 * 
 	 * @param message
 	 * @return
