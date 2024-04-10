@@ -15,7 +15,7 @@
 	<name>bff</name>
 	<description>Microservices project for playapp application</description>
 	<properties>
-		<java.version>22</java.version>
+		<java.version>21</java.version>
 		<spring-ai.version>0.8.1</spring-ai.version>
 		<sonar.projectName>playapp-bff</sonar.projectName>
 		<sonar.projectKey>playapp</sonar.projectKey>
