@@ -5,18 +5,26 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import com.playapp.bff.bean.LocationCode;
 import com.playapp.bff.mapper.WeatherMapper;
 import com.playapp.bff.service.supplier.AccuWeatherRestService;
+import com.playapp.bff.service.supplier.bean.DailyForecast;
+import com.playapp.bff.service.supplier.bean.DayDetails;
+import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
+import com.playapp.bff.service.supplier.bean.Wind;
+import com.playapp.bff.service.supplier.bean.WindDirection;
+import com.playapp.bff.service.supplier.bean.WindSpeed;
 
 public class WeatherServiceTest {
 
@@ -34,44 +42,74 @@ public class WeatherServiceTest {
 	@InjectMocks
 	private WeatherService service;
 
-
-	@Test
-	public void getBeachWeathersTest() {
-		when(accuWeatherRestService.getDetails(Mockito.anyString()))
-				.thenReturn(WeatherDetailsResponse.builder().beachName("test").build());
-		assertNotNull(service.getBeachWeathers(List.of(LocationCode.builder().code("test").build())));
+	@Before
+	public void initMocks() {
+		MockitoAnnotations.openMocks(this);
 	}
 
-//	@Test
-//	public void getInformationDataTest() {
-//		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(WeatherDetailsResponse.builder()
-//				.beachName("PLAYA_LA_CALETA")
-//				.dailyForecasts(List.of(DailyForecast.builder()
-//						.day(DayDetails.builder().wind(
-//								Wind.builder().direction(WindDirection.builder().localized("test").build())
-//										.speed(WindSpeed.builder().value(23.3d).build()).build())
-//								.build())
-//						.build()))
-//				.beachName("test").build());
-//		when(accuWeatherRestService.getLocations(Mockito.anyString(), Mockito.anyString()))
-//				.thenReturn(LocationResponse.builder().type("").version(0).key("0001").build());
-//		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
-//				.thenReturn(LocationCode.builder().name("test").code("0001").build());
-//		List<WeatherDetailsResponse> weatherDetails = List.of(
-//				WeatherDetailsResponse.builder().beachName("PLAYA_LA_CALETA")
-//						.dailyForecasts(List.of(DailyForecast.builder().day(DayDetails.builder()
-//								.wind(Wind.builder().direction(WindDirection.builder().localized("test").build())
-//										.speed(WindSpeed.builder().value(23.3d).build()).build())
-//								.build()).build()))
-//						.beachName("test").build(),
-//				WeatherDetailsResponse.builder().beachName("PLAYA_DE_CAMPOSOTO")
-//						.dailyForecasts(List.of(DailyForecast.builder().day(DayDetails.builder()
-//								.wind(Wind.builder().direction(WindDirection.builder().localized("test").build())
-//										.speed(WindSpeed.builder().value(15.3d).build()).build())
-//								.build()).build()))
-//						.beachName("test").build());
-//		when(service.getBeachWeathers(Mockito.any())).thenReturn(weatherDetails);
-//		assertNotNull(service.getInformationData());
-//	}
+	@Test
+	public void getBeachesDataMuchWindTest() {
+		when(accuWeatherRestService.getLocations(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationResponse.builder().key("123455").build());
+		when(accuWeatherRestService.getDetails(Mockito.anyString()))
+				.thenReturn(WeatherDetailsResponse.builder()
+						.dailyForecasts(List.of(DailyForecast.builder().day(DayDetails.builder()
+								.wind(Wind.builder().direction(WindDirection.builder().localized("ESE").build())
+										.speed(WindSpeed.builder().value(40.0).build()).build())
+								.build())
+								.build()))
+						.build());
+		assertNotNull(service.getBeachesDataByWeather());
+	}
+
+	@Test
+	public void getBeachesDataTest() {
+		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
+				.thenReturn(LocationResponse.builder().key("12").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("212").name("playa").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("213").name("playa").build());
+		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(WeatherDetailsResponse.builder()
+				.dailyForecasts(List.of(DailyForecast.builder()
+						.day(DayDetails.builder()
+								.wind(Wind.builder().direction(WindDirection.builder().localized("ESE").build())
+										.speed(WindSpeed.builder().value(20.0).build()).build())
+								.build())
+						.build()))
+				.build());
+		assertNotNull(service.getBeachesDataByWeather());
+	}
+
+	@Test
+	public void getBeachesDataTest2() {
+		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
+				.thenReturn(LocationResponse.builder().key("12").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("212").name("playa").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("213").name("playa").build());
+		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(WeatherDetailsResponse.builder()
+				.dailyForecasts(List.of(DailyForecast.builder()
+						.day(DayDetails.builder()
+								.wind(Wind.builder().direction(WindDirection.builder().localized("OSO").build())
+										.speed(WindSpeed.builder().value(20.0).build()).build())
+								.build())
+						.build()))
+				.build());
+		assertNotNull(service.getBeachesDataByWeather());
+	}
+
+	@Test
+	public void getBeachesDataTest3() {
+		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
+				.thenReturn(LocationResponse.builder().key("12").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("212").name("playa").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("213").name("playa").build());
+		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(null);
+		assertNotNull(service.getBeachesDataByWeather());
+	}
 
 }

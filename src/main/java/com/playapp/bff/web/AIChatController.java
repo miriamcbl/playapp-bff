@@ -73,6 +73,6 @@ public class AIChatController {
 	 */
 	@GetMapping("/ai/getDetails")
 	public List<WeatherDetailsResponse> getWeatherDetails() {
-		return weatherService.getInformationData();
+		return weatherService.getBeachesDataByWeather();
 	}
 }
