@@ -103,11 +103,15 @@ public class WeatherService {
 	}
 
 	private List<WeatherDetailsResponse> sortAndLimitFinalBeaches(List<WeatherDetailsResponse> weatherDetails) {
-		weatherDetails.sort((firstWeather, secondWeather) -> Double.compare(
-				firstWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue(),
-				secondWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue()));
-		// TODO que pasa si solo hay 1 en la lista
-		return weatherDetails.subList(0, 3);
+		if (weatherDetails.size() >= 3) {
+			weatherDetails.sort((firstWeather, secondWeather) -> Double.compare(
+					firstWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue(),
+					secondWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue()));
+			return weatherDetails.subList(0, 3);
+		} else {
+			return weatherDetails;
+		}
+
 	}
 	
 	private List<WeatherDetailsResponse> getFinalBeachesByDirectionWind(String directionWindToday) {
@@ -139,12 +143,7 @@ public class WeatherService {
 			// qué kmh hay hoy
 			kmhWindToday = Math
 					.round(weatherDetailsCadiz.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue());
-			if (kmhWindToday > 30.0) {
-				// mejor quedarse en casa, mucho viento
-				return finalBeaches;
-			} else {
-				finalBeaches = getFinalBeachesByDirectionWind(directionWindToday);
-			}
+			finalBeaches = kmhWindToday > 30.0 ? finalBeaches : getFinalBeachesByDirectionWind(directionWindToday);
 		} else {
 			// TODO aqui mejor lanzar excepcion "No se puede recuperar el tiempo
 			// actualmente"

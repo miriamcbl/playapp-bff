@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import com.playapp.bff.bean.LocationCode;
 import com.playapp.bff.mapper.WeatherMapper;
 import com.playapp.bff.service.supplier.AccuWeatherRestService;
 import com.playapp.bff.service.supplier.bean.DailyForecast;
@@ -47,7 +48,7 @@ public class WeatherServiceTest {
 	}
 
 	@Test
-	public void getBeachesDataMuchWind() {
+	public void getBeachesDataMuchWindTest() {
 		when(accuWeatherRestService.getLocations(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(LocationResponse.builder().key("123455").build());
 		when(accuWeatherRestService.getDetails(Mockito.anyString()))
@@ -61,21 +62,54 @@ public class WeatherServiceTest {
 		assertNotNull(service.getBeachesDataByWeather());
 	}
 
-//	@Test
-//	public void getBeachesData() {
-//		when(accuWeatherRestService.getLocations(Mockito.anyString(), Mockito.anyString()))
-//				.thenReturn(LocationResponse.builder().key("123455").build());
-//		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(WeatherDetailsResponse.builder()
-//				.dailyForecasts(List.of(DailyForecast.builder()
-//						.day(DayDetails.builder()
-//								.wind(Wind.builder().direction(WindDirection.builder().localized("ESE").build())
-//										.speed(WindSpeed.builder().value(20.0).build()).build())
-//								.build())
-//						.build()))
-//				.build());
-//		assertNotNull(service.getBeachesDataByWeather());
-//	}
+	@Test
+	public void getBeachesDataTest() {
+		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
+				.thenReturn(LocationResponse.builder().key("12").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("212").name("playa").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("213").name("playa").build());
+		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(WeatherDetailsResponse.builder()
+				.dailyForecasts(List.of(DailyForecast.builder()
+						.day(DayDetails.builder()
+								.wind(Wind.builder().direction(WindDirection.builder().localized("ESE").build())
+										.speed(WindSpeed.builder().value(20.0).build()).build())
+								.build())
+						.build()))
+				.build());
+		assertNotNull(service.getBeachesDataByWeather());
+	}
 
+	@Test
+	public void getBeachesDataTest2() {
+		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
+				.thenReturn(LocationResponse.builder().key("12").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("212").name("playa").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("213").name("playa").build());
+		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(WeatherDetailsResponse.builder()
+				.dailyForecasts(List.of(DailyForecast.builder()
+						.day(DayDetails.builder()
+								.wind(Wind.builder().direction(WindDirection.builder().localized("OSO").build())
+										.speed(WindSpeed.builder().value(20.0).build()).build())
+								.build())
+						.build()))
+				.build());
+		assertNotNull(service.getBeachesDataByWeather());
+	}
 
+	@Test
+	public void getBeachesDataTest3() {
+		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
+				.thenReturn(LocationResponse.builder().key("12").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("212").name("playa").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("213").name("playa").build());
+		when(accuWeatherRestService.getDetails(Mockito.anyString())).thenReturn(null);
+		assertNotNull(service.getBeachesDataByWeather());
+	}
 
 }
