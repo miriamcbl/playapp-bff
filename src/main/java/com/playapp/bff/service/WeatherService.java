@@ -90,7 +90,7 @@ public class WeatherService {
 				.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante())).toList();
 		// del listado de todos los weatherDetails de cada playa, nos quedamos con
 		// aquellos cuyo nombre esté indicado en el resultado del filtrado anterior que
-		// corresponde a las playas aptas para levante
+		// corresponde a las playas aptas para viento levante
 		List<WeatherDetailsResponse> weatherDetailsForLevanteBeaches = weatherDetails.stream()
 				.filter(weatherBeach -> levanteBeaches.stream()
 						.anyMatch(levanteBeach -> levanteBeach.name().equals(weatherBeach.getBeachName())))
