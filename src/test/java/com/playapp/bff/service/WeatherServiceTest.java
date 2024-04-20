@@ -23,7 +23,7 @@ import com.playapp.bff.service.supplier.bean.Wind;
 import com.playapp.bff.service.supplier.bean.WindDirection;
 import com.playapp.bff.service.supplier.bean.WindSpeed;
 
-public class WeatherServiceTest {
+class WeatherServiceTest {
 
 	/** The accu weather rest service. */
 	@Mock
@@ -37,12 +37,12 @@ public class WeatherServiceTest {
 	private WeatherService service;
 
 	@BeforeEach
-	public void initMocks() {
+	void initMocks() {
 		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test
-	public void getBeachesDataMuchWindTest() {
+	void getBeachesDataMuchWindTest() {
 		when(accuWeatherRestService.getLocations(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(LocationResponse.builder().key("123455").build());
 		when(accuWeatherRestService.getDetails(Mockito.anyString()))
@@ -57,7 +57,7 @@ public class WeatherServiceTest {
 	}
 
 	@Test
-	public void getBeachesDataTest() {
+	void getBeachesDataTest() {
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
@@ -76,7 +76,7 @@ public class WeatherServiceTest {
 	}
 
 	@Test
-	public void getBeachesDataTest2() {
+	void getBeachesDataTest2() {
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
@@ -95,7 +95,7 @@ public class WeatherServiceTest {
 	}
 
 	@Test
-	public void getBeachesDataTest3() {
+	void getBeachesDataTest3() {
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))

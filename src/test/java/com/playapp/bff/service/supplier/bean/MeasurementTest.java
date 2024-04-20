@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class MeasurementTest {
+class MeasurementTest {
 
 	@Test
-	public void getterAndSetterTest() {
+	void getterAndSetterTest() {
 		Measurement measurement = new Measurement();
 		double value = 21;
 		String unit = "C";
@@ -20,7 +20,7 @@ public class MeasurementTest {
 	}
 
 	@Test
-	public void allArgsConstructorTest() {
+	void allArgsConstructorTest() {
 		double value = 21;
 		String unit = "C";
 		int unitType = 1;

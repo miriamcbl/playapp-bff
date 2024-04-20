@@ -33,8 +33,7 @@ public class WeatherService {
 	 * @param accuWeatherRestService the accu weather rest service
 	 * @param weatherMapper          the weather mapper
 	 */
-	public WeatherService(AccuWeatherRestService accuWeatherRestService, 
-			WeatherMapper weatherMapper) {
+	public WeatherService(AccuWeatherRestService accuWeatherRestService, WeatherMapper weatherMapper) {
 		this.accuWeatherRestService = accuWeatherRestService;
 		this.weatherMapper = weatherMapper;
 	}
@@ -84,8 +83,7 @@ public class WeatherService {
 				&& weatherDetails.getDailyForecasts().get(0).getDay().getWind() != null;
 	}
 
-	private List<WeatherDetailsResponse> getLevanteBeaches(String directionWindToday,
-			List<WeatherDetailsResponse> weatherDetails) {
+	private List<WeatherDetailsResponse> getLevanteBeaches(List<WeatherDetailsResponse> weatherDetails) {
 		List<WeatherDetailsResponse> finalLevanteBeaches = new ArrayList<>();
 		// se obtiene listado de todas las playas aptas para levante
 		List<GeographicCoordinates> levanteBeaches = Arrays.asList(GeographicCoordinates.values()).stream()
@@ -113,7 +111,7 @@ public class WeatherService {
 		}
 
 	}
-	
+
 	private List<WeatherDetailsResponse> getFinalBeachesByDirectionWind(String directionWindToday) {
 		List<WeatherDetailsResponse> finalBeaches = new ArrayList<>();
 		// Listado con el código asociado a cada playa según AccuWeather
@@ -123,9 +121,9 @@ public class WeatherService {
 		// se comprueba si hoy hay levante en cadiz
 		boolean isLevante = CollectionUtils.isNotEmpty(weatherDetails)
 				? Arrays.stream(LevanteWind.values()).anyMatch(wind -> wind.getShortName().equals(directionWindToday))
-				: false;
+				: Boolean.FALSE;
 		// se obtiene en base a si hay o no levante las playas finales
-		finalBeaches = isLevante ? getLevanteBeaches(directionWindToday, weatherDetails)
+		finalBeaches = isLevante ? getLevanteBeaches(weatherDetails)
 				: sortAndLimitFinalBeaches(weatherDetails);
 		return finalBeaches;
 	}

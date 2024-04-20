@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.Test;
 
-public class LevanteWindTest {
+class LevanteWindTest {
 
 	@Test
-	public void getShortNameTest() {
+	void getShortNameTest() {
 		assertEquals("E", LevanteWind.ESTE.getShortName());
 		assertEquals("ESE", LevanteWind.ESTESURESTE.getShortName());
 		assertEquals("SE", LevanteWind.SUERESTE.getShortName());
