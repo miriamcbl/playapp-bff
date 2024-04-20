@@ -86,11 +86,8 @@ public class AIChatController {
 		// Crear el prompt con el mensaje y las opciones del chat
 		Prompt prompt = new Prompt(new UserMessage(message), chatOptions);
 
-		// Llamar al cliente de chat para obtener la respuesta
-		ChatResponse cont = chatClient.call(prompt);
-
-		// Devolver la respuesta
-		return cont;
+		// Llamar al cliente de chat para obtener y devolver la respuesta
+		return chatClient.call(prompt);
 	}
 
 }
