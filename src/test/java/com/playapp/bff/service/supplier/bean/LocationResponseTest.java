@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class LocationResponseTest {
+class LocationResponseTest {
 	@Test
-	public void getterAndSetterTest() {
+	void getterAndSetterTest() {
 		LocationResponse locationResponse = new LocationResponse();
 		int version = 1;
 		String key = "0001";
@@ -20,7 +20,7 @@ public class LocationResponseTest {
 	}
 
 	@Test
-	public void allArgsConstructorTest() {
+	void allArgsConstructorTest() {
 		int version = 1;
 		String key = "0001";
 		String type = "";

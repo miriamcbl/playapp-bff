@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class CompassRoseTest {
+class CompassRoseTest {
 	@Test
-	public void getShortNameTest() {
+	void getShortNameTest() {
 		assertEquals("N", CompassRose.NORTE.getShortName());
 		assertEquals("E", CompassRose.ESTE.getShortName());
 		assertEquals("ESE", CompassRose.ESTESURESTE.getShortName());

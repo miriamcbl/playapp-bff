@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-public class LocationCodeTest {
+class LocationCodeTest {
 
 	@Test
-	public void testConstructorAndGetters() {
+	void testConstructorAndGetters() {
 		String name = "Playa Bolonia";
 		String code = "11";
 		LocationCode locationCode = new LocationCode(name, code);
@@ -18,7 +18,7 @@ public class LocationCodeTest {
 	}
 
 	@Test
-	public void testBuilder() {
+	void testBuilder() {
 		String name = "Playa Bolonia";
 		String code = "11";
 		LocationCode locationCode = LocationCode.builder().name(name).code(code).build();
@@ -28,7 +28,7 @@ public class LocationCodeTest {
 	}
 
 	@Test
-	public void testSetters() {
+	void testSetters() {
 		String name = "Playa Bolonia";
 		String code = "11";
 		LocationCode locationCode = new LocationCode();

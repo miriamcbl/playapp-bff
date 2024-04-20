@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class RealFeelTemperatureTest {
+class RealFeelTemperatureTest {
 
 	@Test
-	public void getterAndSetterTest() {
+	void getterAndSetterTest() {
 		RealFeelTemperature realFeelTemperature = new RealFeelTemperature();
 		Measurement minimum = new Measurement();
 		Measurement maximum = new Measurement();
@@ -18,7 +18,7 @@ public class RealFeelTemperatureTest {
 	}
 
 	@Test
-	public void allArgsConstructorTest() {
+	void allArgsConstructorTest() {
 		Measurement minimum = new Measurement();
 		Measurement maximum = new Measurement();
 		RealFeelTemperature realFeelTemperature = new RealFeelTemperature(minimum, maximum);

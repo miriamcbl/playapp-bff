@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class TemperatureTest {
+class TemperatureTest {
 
 	@Test
-	public void getterAndSetterTest() {
+	void getterAndSetterTest() {
 		Temperature temperature = new Temperature();
 		Measurement minimum = new Measurement();
 		Measurement maximum = new Measurement();
@@ -18,7 +18,7 @@ public class TemperatureTest {
 	}
 
 	@Test
-	public void allArgsConstructorTest() {
+	void allArgsConstructorTest() {
 		Measurement minimum = new Measurement();
 		Measurement maximum = new Measurement();
 		Temperature temperature = new Temperature(minimum, maximum);

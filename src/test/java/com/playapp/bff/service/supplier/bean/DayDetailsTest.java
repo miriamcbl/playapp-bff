@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class DayDetailsTest {
+class DayDetailsTest {
 
 	@Test
-	public void getterAndSetterTest() {
+	void getterAndSetterTest() {
 		DayDetails dayDetails = new DayDetails();
 		Wind wind = new Wind();
 		Wind windGust = new Wind();
@@ -18,7 +18,7 @@ public class DayDetailsTest {
 	}
 
 	@Test
-	public void allArgsConstructorTest() {
+	void allArgsConstructorTest() {
 		Wind wind = new Wind();
 		Wind windGust = new Wind();
 		DayDetails dayDetails = new DayDetails(wind, windGust);

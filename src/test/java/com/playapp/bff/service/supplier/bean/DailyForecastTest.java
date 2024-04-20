@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class DailyForecastTest {
 
 	@Test
-	public void getterAndSetterTest() {
+	void getterAndSetterTest() {
 		DailyForecast forecast = new DailyForecast();
 		Temperature temperature = new Temperature();
 		forecast.setTemperature(temperature);
@@ -21,7 +21,7 @@ class DailyForecastTest {
 	}
 
 	@Test
-	public void allArgsConstructorTest() {
+	void allArgsConstructorTest() {
 		Temperature temperature = new Temperature();
 		DayDetails dayDetails = new DayDetails();
 		RealFeelTemperature realFeelTemperature = new RealFeelTemperature();
