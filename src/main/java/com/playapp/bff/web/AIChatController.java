@@ -6,6 +6,7 @@ import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatClient;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -75,4 +76,21 @@ public class AIChatController {
 	public List<WeatherDetailsResponse> getWeatherDetails() {
 		return weatherService.getBeachesDataByWeather();
 	}
+
+	@GetMapping("/ai/generateMyStream")
+	public ChatResponse generateMyStream(
+			@RequestParam(value = "message", defaultValue = "Dime a qué playa es mejor ir hoy en Cádiz") String message) {
+		// Definir las opciones del chat para llamar a la función "weatherFunction"
+		OpenAiChatOptions chatOptions = OpenAiChatOptions.builder().withFunction("weatherFunction").build();
+
+		// Crear el prompt con el mensaje y las opciones del chat
+		Prompt prompt = new Prompt(new UserMessage(message), chatOptions);
+
+		// Llamar al cliente de chat para obtener la respuesta
+		ChatResponse cont = chatClient.call(prompt);
+
+		// Devolver la respuesta
+		return cont;
+	}
+
 }
