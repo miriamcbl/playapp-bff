@@ -1,19 +1,16 @@
 package com.playapp.bff.service;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
 import com.playapp.bff.bean.LocationCode;
 import com.playapp.bff.mapper.WeatherMapper;
@@ -28,9 +25,6 @@ import com.playapp.bff.service.supplier.bean.WindSpeed;
 
 public class WeatherServiceTest {
 
-	@Rule
-	public MockitoRule rule = MockitoJUnit.rule();
-
 	/** The accu weather rest service. */
 	@Mock
 	private AccuWeatherRestService accuWeatherRestService;
@@ -42,7 +36,7 @@ public class WeatherServiceTest {
 	@InjectMocks
 	private WeatherService service;
 
-	@Before
+	@BeforeEach
 	public void initMocks() {
 		MockitoAnnotations.openMocks(this);
 	}

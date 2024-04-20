@@ -2,8 +2,8 @@ package com.playapp.bff.service.supplier;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,7 +17,7 @@ public class AccuWeatherRestServiceTest {
 
 	private MockWebServer server;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		this.server = new MockWebServer();
 		this.restService = new AccuWeatherRestService(WebClient.builder(), server.url("/").toString(), "");
