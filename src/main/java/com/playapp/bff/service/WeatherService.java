@@ -101,14 +101,15 @@ public class WeatherService {
 	}
 
 	private List<WeatherDetailsResponse> sortAndLimitFinalBeaches(List<WeatherDetailsResponse> weatherDetails) {
-		if (weatherDetails.size() >= 3) {
-			weatherDetails.sort((firstWeather, secondWeather) -> Double.compare(
-					firstWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue(),
-					secondWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue()));
-			return weatherDetails.subList(0, 3);
-		} else {
-			return weatherDetails;
-		}
+//		if (weatherDetails.size() >= 3) {
+//			weatherDetails.sort((firstWeather, secondWeather) -> Double.compare(
+//					firstWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue(),
+//					secondWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue()));
+//			return weatherDetails.subList(0, 3);
+//		} else {
+//			return weatherDetails;
+//		}
+		return weatherDetails;
 
 	}
 
