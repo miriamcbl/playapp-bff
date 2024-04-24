@@ -56,7 +56,7 @@ pipeline {
                 }                
             }
         }
-		stage('Publish Version') {
+	stage('Publish Version') {
             steps {
                 script {
                     echo 'Publishing new version and creating and pushing tag in GitHub'
@@ -78,7 +78,7 @@ pipeline {
                         }
                     }
                     // Crear tag con la versión
-                    sh "git tag -a v${version} -m 'Versión ${version}'"
+                    sh "git tag -a ${version} -m 'Versión ${version}'"
                     def gitPushCommand = 'git push --tags'
                     def pushResult = sh(script: gitPushCommand, returnStatus: true)
                     if (pushResult == 0) {
