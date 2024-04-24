@@ -22,7 +22,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-           		echo 'Cloning git repo'
+           	echo 'Cloning git repo'
                 // Clonar el repositorio de GitHub
                 git branch: 'main', url: 'https://github.com/miriamcbl/playapp-bff.git'
             }
@@ -30,7 +30,7 @@ pipeline {
         stage('Maven Build') {
             steps {
                 script {
-                	echo 'Building project with mvn'
+		    echo 'Building project with mvn'
                     sh 'mvn install'
                 }
             }
@@ -39,7 +39,7 @@ pipeline {
             steps {
                 // Verificar el estado del Quality Gate                
                 script {
-                	echo 'Verifying Sonar quailty gate status'
+        	    echo 'Verifying Sonar quailty gate status'
                     def qualityGateUrl = "https://sonarcloud.io/api/qualitygates/project_status?projectKey=miriamcbl_playapp-bff"
                     // llamada http especificando el codigo que se considera valido
                     def response = httpRequest(url: qualityGateUrl, validResponseCodes: '200')
