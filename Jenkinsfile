@@ -3,7 +3,7 @@ pipeline {
     
     // Parametrización de la pipeline
     parameters {
-        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Introduzca la version')
+        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Introduzca la versión')
     }    
     environment{
     	//Declaracion de variables de entorno
