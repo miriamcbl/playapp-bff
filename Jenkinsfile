@@ -60,9 +60,9 @@ pipeline {
         }
         stage('Security properties'){
         	steps {
-        		script {
+        		script {        			
 		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
-		
+					sh "chmod +w ${propertiesDir}"
 		            // Se lee el properties
 		            def propertiesFile = readFile(propertiesDir)
 		
