@@ -61,22 +61,22 @@ pipeline {
         stage('Security properties'){
         	steps {
         		script {
-   					def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
-
-                    // Se lee el properties
-                    def propertiesFile = readFile(propertiesDir)
-
-                    // Se actualiza con las secrets 
-                    propertiesFile = propertiesFile.replaceAll(/spring\.ai\.openai\.api-key=.*/, "spring.ai.openai.api-key=${OPENAI_API_KEY}")
-					propertiesFile = propertiesFile.replaceAll(/accuweather\.apikey=.*/, "env.accuweather.apikey=${ACCUWEATHER_API_KEY}")
-
-                    // se escribe todo
-                    writeFile file: propertiesDir, text: propertiesFile 
-                    
-                    // Leer el contenido actualizado del archivo
-					def updatedPropertiesContent = readFile(propertiesDir)
-					echo "Contenido actualizado del archivo:"
-					echo updatedPropertiesContent            
+		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
+		
+		            // Se lee el properties
+		            def propertiesFile = readFile(propertiesDir)
+		
+		            // Se actualiza con las secrets 
+		            propertiesFile = propertiesFile.replaceAll(/spring\.ai\.openai\.api-key=.*/, "spring.ai.openai.api-key=${OPENAI_API_KEY}")
+		            propertiesFile = propertiesFile.replaceAll(/accuweather\.apikey=.*/, "env.accuweather.apikey=${ACCUWEATHER_API_KEY}")
+		
+		            // se escribe todo
+		            writeFile file: propertiesDir, text: propertiesFile 
+		
+		            // Leer el contenido actualizado del archivo
+		            def updatedProperties = readFile(propertiesDir)
+		            echo "Contenido actualizado del archivo:"
+		            echo updatedProperties       
         		}
         	}
         }
