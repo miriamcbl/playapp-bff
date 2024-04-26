@@ -6,13 +6,15 @@ pipeline {
         string(name: 'VERSION', defaultValue: '1.0.0', description: 'Introduzca la versión')
     }    
     environment{
-    	//Declaracion de variables de entorno
+    	  // Declaracion de variables de entorno
         SONAR_TOKEN = credentials('sonarcloud-token')
         DOCKER_HUB_USERNAME = credentials('docker-hub-username')
         DOCKER_HUB_PASSWORD = credentials('docker-hub-token')
         DOCKER_HUB_REPOSITORY = 'playapp_back'
         DOCKER_IMAGE_TAG = 'latest'
         PLAYAPP_EC2 = credentials('playapp_ec2')
+        OPENAI_API_KEY = credentials('openai-api-key')
+        ACCUWEATHER_API_KEY = credentials('accuweather-api-key')        
     }
     tools {
         // Utiliza maven instalado en la maquina
@@ -56,7 +58,29 @@ pipeline {
                 }                
             }
         }
-	stage('Publish Version') {
+        stage('Security properties'){
+        	steps {
+        		script {
+   					def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
+
+                    // Se lee el properties
+                    def propertiesFile = readFile(propertiesDir)
+
+                    // Se actualiza con las secrets 
+                    propertiesFile = propertiesContent.replaceAll(/spring\.ai\.openai\.api-key=.*/, "spring.ai.openai.api-key=${OPENAI_API_KEY}")
+                    propertiesFile = propertiesContent.replaceAll(/accuweather\.apikey=.*/, "env.accuweather.apikey=${ACCUWEATHER_API_KEY}")
+
+                    // se escribe todo
+                    writeFile file: propertiesDir, text: propertiesFile 
+                    
+                    // Leer el contenido actualizado del archivo
+					def updatedPropertiesContent = readFile(propertiesFile)
+					echo "Contenido actualizado del archivo:"
+					echo updatedPropertiesContent            
+        		}
+        	}
+        }
+		stage('Publish Version') {
             steps {
                 script {
                     echo 'Publishing new version and creating and pushing tag in GitHub'
