@@ -61,7 +61,7 @@ pipeline {
         stage('Security properties'){
         	steps {
         		script {      
-        			ls -l ${WORKSPACE}/src/main/resources/application.properties
+        			ls -l /var/lib/jenkins/workspace/playapp-pipeline/src/main/resources/application.properties
 		            groups jenkins   			
 		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
 					sh "chmod +w ${propertiesDir}"
