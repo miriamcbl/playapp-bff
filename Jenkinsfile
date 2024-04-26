@@ -67,14 +67,14 @@ pipeline {
                     def propertiesFile = readFile(propertiesDir)
 
                     // Se actualiza con las secrets 
-                    propertiesFile = propertiesContent.replaceAll(/spring\.ai\.openai\.api-key=.*/, "spring.ai.openai.api-key=${OPENAI_API_KEY}")
-                    propertiesFile = propertiesContent.replaceAll(/accuweather\.apikey=.*/, "env.accuweather.apikey=${ACCUWEATHER_API_KEY}")
+                    propertiesFile = propertiesFile.replaceAll(/spring\.ai\.openai\.api-key=.*/, "spring.ai.openai.api-key=${OPENAI_API_KEY}")
+					propertiesFile = propertiesFile.replaceAll(/accuweather\.apikey=.*/, "env.accuweather.apikey=${ACCUWEATHER_API_KEY}")
 
                     // se escribe todo
                     writeFile file: propertiesDir, text: propertiesFile 
                     
                     // Leer el contenido actualizado del archivo
-					def updatedPropertiesContent = readFile(propertiesFile)
+					def updatedPropertiesContent = readFile(propertiesDir)
 					echo "Contenido actualizado del archivo:"
 					echo updatedPropertiesContent            
         		}
