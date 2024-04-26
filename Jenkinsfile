@@ -76,7 +76,7 @@ pipeline {
 		            // Leer el contenido actualizado del archivo
 		            def updatedProperties = readFile(propertiesDir)
 		            echo "Contenido actualizado del archivo:"
-		            echo updatedProperties       
+		            echo updatedProperties
         		}
         	}
         }
