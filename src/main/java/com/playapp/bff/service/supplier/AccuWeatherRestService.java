@@ -28,8 +28,8 @@ public class AccuWeatherRestService extends WebClientService {
 	 * @param accuWeatherApiKey the accu weather api key
 	 */
 	public AccuWeatherRestService(WebClient.Builder webClientBuilder,
-			@Value("${env.accuweather-forecasts.rest}") String url,
-			@Value("${env.accuweather.apikey}") String accuWeatherApiKey) {
+			@Value("${accuweather-forecasts.rest}") String url,
+			@Value("${accuweather.apikey}") String accuWeatherApiKey) {
 		super(webClientBuilder, url);
 		this.accuWeatherApiKey = accuWeatherApiKey;
 	}
