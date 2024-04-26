@@ -3,10 +3,10 @@ pipeline {
     
     // Parametrización de la pipeline
     parameters {
-        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Ingrese la versión')
+        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Introduzca la versión')
     }    
     environment{
-    	//Declaracion de variables de entorno
+    	  // Declaracion de variables de entorno
         SONAR_TOKEN = credentials('sonarcloud-token')
         DOCKER_HUB_USERNAME = credentials('docker-hub-username')
         DOCKER_HUB_PASSWORD = credentials('docker-hub-token')
@@ -24,7 +24,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-           		echo 'Cloning git repo'
+           	echo 'Cloning git repo'
                 // Clonar el repositorio de GitHub
                 git branch: 'main', url: 'https://github.com/miriamcbl/playapp-bff.git'
             }
@@ -32,7 +32,7 @@ pipeline {
         stage('Maven Build') {
             steps {
                 script {
-                	echo 'Building project with mvn'
+		    echo 'Building project with mvn'
                     sh 'mvn install'
                 }
             }
@@ -41,7 +41,7 @@ pipeline {
             steps {
                 // Verificar el estado del Quality Gate                
                 script {
-                	echo 'Verifying Sonar quailty gate status'
+        	    echo 'Verifying Sonar quailty gate status'
                     def qualityGateUrl = "https://sonarcloud.io/api/qualitygates/project_status?projectKey=miriamcbl_playapp-bff"
                     // llamada http especificando el codigo que se considera valido
                     def response = httpRequest(url: qualityGateUrl, validResponseCodes: '200')
@@ -102,7 +102,7 @@ pipeline {
                         }
                     }
                     // Crear tag con la versión
-                    sh "git tag -a v${version} -m 'Versión ${version}'"
+                    sh "git tag -a ${version} -m 'Versión ${version}'"
                     def gitPushCommand = 'git push --tags'
                     def pushResult = sh(script: gitPushCommand, returnStatus: true)
                     if (pushResult == 0) {
