@@ -13,5 +13,5 @@ COPY ${JAR_FILE} app.jar
 # Permisos ejecucion
 RUN chmod +x app.jar
 
-# Ejecuta jar
+# Ejecuta app jar
 CMD ["java", "-jar", "/app.jar"]
