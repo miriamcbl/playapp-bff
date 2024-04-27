@@ -71,12 +71,7 @@ pipeline {
 		            propertiesFile = propertiesFile.replaceAll('accuweather.apikey: your_api_key', "accuweather.apikey: ${ACCUWEATHER_API_KEY}")
 		
 		            // se escribe todo
-		            writeFile file: propertiesDir, text: propertiesFile 
-		
-		            // Leer el contenido actualizado del archivo
-		            def updatedProperties = readFile(propertiesDir)
-		            echo "Contenido actualizado del archivo:"
-		            echo updatedProperties
+		            writeFile file: propertiesDir, text: propertiesFile		
         		}
         	}
         }
