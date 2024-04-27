@@ -60,7 +60,8 @@ pipeline {
         }
         stage('Security properties'){
         	steps {
-        		script {		
+        		script {
+        			echo 'Injecting the sensitive properties'		
 		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
 					sh "chmod g+w ${propertiesDir}"
 		            // Se lee el properties
