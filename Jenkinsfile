@@ -58,24 +58,6 @@ pipeline {
                 }                
             }
         }
-        stage('Security properties'){
-        	steps {
-        		script {
-        			echo 'Injecting the sensitive properties'		
-		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
-					sh "chmod g+w ${propertiesDir}"
-		            // Se lee el properties
-		            def propertiesFile = readFile(propertiesDir)
-		
-		            // Se actualiza con las secrets 
-		            propertiesFile = propertiesFile.replaceAll('spring.ai.openai.api-key: your_api_key', "spring.ai.openai.api-key: ${OPENAI_API_KEY}")
-		            propertiesFile = propertiesFile.replaceAll('accuweather.apikey: your_api_key', "accuweather.apikey: ${ACCUWEATHER_API_KEY}")
-		
-		            // se escribe todo
-		            writeFile file: propertiesDir, text: propertiesFile		
-        		}
-        	}
-        }
 		stage('Publish Version') {
             steps {
                 script {
@@ -108,6 +90,24 @@ pipeline {
                     }
                 }
             }
+        }
+        stage('Security properties'){
+        	steps {
+        		script {
+        			echo 'Injecting the sensitive properties'		
+		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
+					sh "chmod g+w ${propertiesDir}"
+		            // Se lee el properties
+		            def propertiesFile = readFile(propertiesDir)
+		
+		            // Se actualiza con las secrets 
+		            propertiesFile = propertiesFile.replaceAll('spring.ai.openai.api-key: your_api_key', "spring.ai.openai.api-key: ${OPENAI_API_KEY}")
+		            propertiesFile = propertiesFile.replaceAll('accuweather.apikey: your_api_key', "accuweather.apikey: ${ACCUWEATHER_API_KEY}")
+		
+		            // se escribe todo
+		            writeFile file: propertiesDir, text: propertiesFile		
+        		}
+        	}
         }
         stage("Build Docker Image"){
             steps {
