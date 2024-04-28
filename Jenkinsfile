@@ -60,7 +60,9 @@ pipeline {
         }
 		stage('Publish Version') {
             steps {
-                script {          	
+                script {
+		    sh "git fetch"
+                    sh "git tag -d \$(git tag -l)"
                     echo 'Publishing new version and creating and pushing tag in GitHub'
                     def version = params.VERSION
                     // Actualizar la versión en el archivo pom.xml
@@ -105,8 +107,7 @@ pipeline {
 		            propertiesFile = propertiesFile.replaceAll('accuweather.apikey: your_api_key', "accuweather.apikey: ${ACCUWEATHER_API_KEY}")
 		
 		            // se escribe todo
-		            writeFile file: propertiesDir, text: propertiesFile		
-		            sh 'mvn install'
+		            writeFile file: propertiesDir, text: propertiesFile
         		}
         	}
         }
