@@ -106,6 +106,7 @@ pipeline {
 		
 		            // se escribe todo
 		            writeFile file: propertiesDir, text: propertiesFile		
+		            sh 'mvn install'
         		}
         	}
         }
