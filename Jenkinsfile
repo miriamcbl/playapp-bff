@@ -84,7 +84,7 @@ pipeline {
                     // Actualizar la versión en el archivo pom.xml
                     sh "mvn versions:set -DnewVersion=${version}"
                     // Agregar los archivos al área de preparación
-                    sh "git add ."
+                    sh "git add pom.xml"
                     // Realizar commit
                     sh "git commit -am 'Jenkins: actualización de la versión a ${version}'"
                     // Configurar la rama ascendente antes de realizar el push
