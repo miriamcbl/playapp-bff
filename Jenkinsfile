@@ -138,11 +138,16 @@ pipeline {
                         // Baja los últimos cambios subidos
                         sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerPullCmd}'"
                         // Verificar si el contenedor está en ejecución antes de detenerlo
-                        def checkContainerCmd = "docker ps --filter name=playapp_backend --format {{.Names}}"   
-                        def checkExistsContainer = sh(script: "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${checkContainerCmd}'", returnStdout: true).trim()
-                        if (checkExistsContainer == 'playapp_backend') {
-                            echo "Existe contenedor activo, se procede a parar y eliminar"
+                        def checkContainerRunningCmd = "docker ps --filter name=playapp_backend --format {{.Names}}"
+                        def checkContainerCreatedCmd = "docker ps -a --filter name=playapp_backend --format {{.Names}}"   
+                        def checkExistsContainerRunning = sh(script: "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${checkContainerRunningCmd}'", returnStdout: true).trim()
+                        def checkExistsContainerCreated = sh(script: "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${checkContainerCreatedCmd}'", returnStdout: true).trim()
+                        if (checkExistsContainerRunning == 'playapp_backend') {
+                            echo "Existe contenedor activo, se procede parar"
                             sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerStopCmd}'"
+                        }
+                        if(checkExistsContainerCreated == 'playapp_backend'){
+                        	echo "Existe contenedor creado, se elimina"
                             sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerRmvCmd}'"
                         }
                         sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerRunCmd}'"
