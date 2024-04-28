@@ -61,6 +61,8 @@ pipeline {
 		stage('Publish Version') {
             steps {
                 script {
+                	sh "git fetch"
+                	sh "git tag -d $(git tag -l)"                	
                     echo 'Publishing new version and creating and pushing tag in GitHub'
                     def version = params.VERSION
                     // Actualizar la versión en el archivo pom.xml
