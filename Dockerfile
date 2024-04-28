@@ -1,6 +1,9 @@
 # Java21 de amazon AWS
 FROM amazoncorretto:21
 
+RUN yum install -y iputils
+RUN yum install -y procps
+
 # Argumento de entrada por comando
 ARG JAR_FILE
 
