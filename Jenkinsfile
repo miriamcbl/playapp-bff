@@ -146,7 +146,7 @@ pipeline {
                             echo "Existe contenedor activo, se procede parar"
                             sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerStopCmd}'"
                         }
-                        if(checkExistsContainerCreated == 'playapp_backend'){
+                        if (checkExistsContainerCreated == 'playapp_backend'){
                         	echo "Existe contenedor creado, se elimina"
                             sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerRmvCmd}'"
                         }
