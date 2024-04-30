@@ -32,7 +32,11 @@ pipeline {
         stage('Maven Build') {
             steps {
                 script {
-		    echo 'Building project with mvn'
+		    		echo 'Building project with mvn'
+                    sh '''
+	                    cd ${WORKSPACE}/target
+	                    ls -t *.jar | tail -n +2 | xargs rm
+                	'''
                     sh 'mvn install'
                 }
             }
