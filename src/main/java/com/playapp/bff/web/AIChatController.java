@@ -100,6 +100,11 @@ public class AIChatController {
 		return "Hola Mundo";
 	}
 
+	@GetMapping("/ai/holaMund2")
+	public String getDetailsHola2() {
+		return "Hola Mundo2";
+	}
+
 	@GetMapping("/ai/rest")
 	public LocationResponse getdetailsRest() {
 		return accuweather.getLocations("36.502971", "-6.276354");
