@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.playapp.bff.service.WeatherService;
+import com.playapp.bff.service.supplier.AccuWeatherRestService;
+import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 
 import reactor.core.publisher.Flux;
@@ -24,10 +26,12 @@ import reactor.core.publisher.Flux;
 public class AIChatController {
 
 	/** The chat client. */
-    private final OpenAiChatClient chatClient;
+	private final OpenAiChatClient chatClient;
 
 	/** The weather service. */
 	private WeatherService weatherService;
+
+	private AccuWeatherRestService accuweather;
 
 	/**
 	 * Instantiates a new AI chat controller.
@@ -35,12 +39,13 @@ public class AIChatController {
 	 * @param chatClient     the chat client
 	 * @param weatherService the weather service
 	 */
-    @Autowired
-	public AIChatController(OpenAiChatClient chatClient,
-			WeatherService weatherService) {
-        this.chatClient = chatClient;
+	@Autowired
+	public AIChatController(OpenAiChatClient chatClient, WeatherService weatherService,
+			AccuWeatherRestService accuweather) {
+		this.chatClient = chatClient;
 		this.weatherService = weatherService;
-    }
+		this.accuweather = accuweather;
+	}
 
 	/**
 	 * Generate.
@@ -48,10 +53,10 @@ public class AIChatController {
 	 * @param message the message
 	 * @return the string
 	 */
-    @GetMapping("/ai/generate")
+	@GetMapping("/ai/generate")
 	public String generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
 		return chatClient.call(message);
-    }
+	}
 
 	/**
 	 * Generate a stream from prompts
@@ -90,4 +95,13 @@ public class AIChatController {
 		return chatClient.call(prompt);
 	}
 
+	@GetMapping("/ai/holaMundo")
+	public String getDetailsHola() {
+		return "Hola Mundo";
+	}
+
+	@GetMapping("/ai/rest")
+	public LocationResponse getdetailsRest() {
+		return accuweather.getLocations("36.502971", "-6.276354");
+	}
 }
