@@ -35,7 +35,8 @@ pipeline {
 		    		echo 'Building project with mvn'
                     sh '''
 	                    cd ${WORKSPACE}/target
-	                    ls -t *.jar | tail -n +2 | xargs rm
+	                    rm *.jar
+	                    rm *.jar.original
                 	'''
                     sh 'mvn install'
                 }
