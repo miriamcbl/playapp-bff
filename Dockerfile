@@ -16,5 +16,8 @@ COPY ${JAR_FILE} app.jar
 # Permisos ejecucion
 RUN chmod +x app.jar
 
+EXPOSE 80
+EXPOSE 443
+
 # Ejecuta app jar
 CMD ["java", "-jar", "/app.jar", ">>", "/var/log/app.log", "2>&1"]
