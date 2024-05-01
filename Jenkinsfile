@@ -33,11 +33,6 @@ pipeline {
             steps {
                 script {
 		    		echo 'Building project with mvn'
-                    sh '''
-	                    cd ${WORKSPACE}/target
-	                    rm *.jar
-	                    rm *.jar.original
-                	'''
                     sh 'mvn install'
                 }
             }
@@ -113,6 +108,11 @@ pipeline {
 		
 		            // se escribe todo
 		            writeFile file: propertiesDir, text: propertiesFile
+		            sh '''
+	                    cd ${WORKSPACE}/target
+	                    rm *.jar
+	                    rm *.jar.original
+                	'''
 		            sh 'mvn install'
         		}
         	}
