@@ -57,10 +57,12 @@ public class AccuWeatherRestService extends WebClientService {
 	public LocationResponse getLocations(String latitude, String longitude) {
 		log.info("Begin - getLocations");
 		String latitudeLongitudeForQueryParam = latitude + "," + longitude;
+		log.info(latitudeLongitudeForQueryParam);
 		UriComponentsBuilder builder = UriComponentsBuilder
 				.fromHttpUrl(url + "/locations/v1/cities/geoposition/search");
 		builder.queryParam("apikey", accuWeatherApiKey);
 		builder.queryParam("q", latitudeLongitudeForQueryParam);
+		log.info(builder.toUriString());
 		LocationResponse locationResponse = webClient.get().uri(builder.build().encode().toUriString()).retrieve()
 				.bodyToMono(LocationResponse.class).block();
 		log.info("End - getLocations - Response: {}", locationResponse);
