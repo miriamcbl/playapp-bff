@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.playapp</groupId>
 	<artifactId>bff</artifactId>
-	<version>0.0.27</version>
+	<version>0.0.29</version>
 	<name>bff</name>
 	<description>Microservices project for playapp application</description>
 	<properties>
