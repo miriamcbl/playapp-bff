@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
 		    		echo 'Building project with mvn'
-                    sh 'mvn install'
+                    sh 'mvn verify'
                 }
             }
         }
@@ -60,10 +60,10 @@ pipeline {
         }
 		stage('Publish Version') {
             steps {
-                script {
-		    sh "git fetch"
-                    sh "git tag -d \$(git tag -l)"
+                script {                
                     echo 'Publishing new version and creating and pushing tag in GitHub'
+		    		//sh "git fetch"
+                    //sh "git tag -d \$(git tag -l)"
                     def version = params.VERSION
                     // Actualizar la versión en el archivo pom.xml
                     sh "mvn versions:set -DnewVersion=${version}"
