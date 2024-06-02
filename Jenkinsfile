@@ -133,7 +133,7 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying image to EC2 - Playapp'
-                    def dockerRunCmd = "docker run --name playapp_backend -p 8090:8080 -d ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_IMAGE_TAG}"
+                    def dockerRunCmd = "docker run --name playapp_backend -p 8080:8080 -d ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_IMAGE_TAG}"
                     def dockerLoginCmd = "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
                     def dockerPullCmd = "docker pull docker.io/${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_IMAGE_TAG}"
                     def dockerStopCmd = "docker stop playapp_backend"
