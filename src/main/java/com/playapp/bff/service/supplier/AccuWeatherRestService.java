@@ -8,6 +8,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,25 +36,13 @@ public class AccuWeatherRestService extends WebClientService {
 	}
 
 	/**
-	 * Gets the details.
+	 * Gets the locations code by the geo position.
 	 *
-	 * @return the details
+	 * @param latitude  the latitude
+	 * @param longitude the longitude
+	 * @return the locations
 	 */
-	public WeatherDetailsResponse getDetails(String locationCode) {
-		log.info("Begin - getDetails");
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
-				url + "/forecasts/v1/daily/1day/" + locationCode);
-		builder.queryParam("apikey", accuWeatherApiKey);
-		builder.queryParam("language", "es-es");
-		builder.queryParam("details", "true");
-		builder.queryParam("metric", "true");
-		WeatherDetailsResponse weather = webClient.get().uri(builder.build().encode().toUriString())
-				.retrieve()
-				.bodyToMono(WeatherDetailsResponse.class).block();
-		log.info("End - getDetails - Response: {}", weather);
-		return weather;
-	}
-
+	@CircuitBreaker(name = "accuweather", fallbackMethod = "getLocationsFallback")
 	public LocationResponse getLocations(String latitude, String longitude) {
 		log.info("Begin - getLocations");
 		String latitudeLongitudeForQueryParam = latitude + "," + longitude;
@@ -65,6 +54,39 @@ public class AccuWeatherRestService extends WebClientService {
 				.bodyToMono(LocationResponse.class).block();
 		log.info("End - getLocations - Response: {}", locationResponse);
 		return locationResponse;
+	}
+
+	public WeatherDetailsResponse getLocationsFallback(String latitude, String longitude, Throwable throwable)
+			throws Exception {
+		throw new Exception("Error al obtener los códigos de las ubicaciones");
+	}
+
+	/**
+	 * Gets the days weather details for the indicated days (1, 5, 10 or 15), by the
+	 * location code.
+	 *
+	 * @param days         the days
+	 * @param locationCode the location code
+	 * @return the days weather details
+	 */
+	@CircuitBreaker(name = "accuweather", fallbackMethod = "getWeatherDetailsByDaysFallback")
+	public WeatherDetailsResponse getWeatherDetailsByDays(String days, String locationCode) {
+		log.info("Begin - getDetails");
+		UriComponentsBuilder builder = UriComponentsBuilder
+				.fromHttpUrl(url + "/forecasts/v1/daily/" + days + "day/" + locationCode);
+		builder.queryParam("apikey", accuWeatherApiKey);
+		builder.queryParam("language", "es-es");
+		builder.queryParam("details", "true");
+		builder.queryParam("metric", "true");
+		WeatherDetailsResponse weather = webClient.get().uri(builder.build().encode().toUriString()).retrieve()
+				.bodyToMono(WeatherDetailsResponse.class).block();
+		log.info("End - getDetails - Response: {}", weather);
+		return weather;
+	}
+
+	public WeatherDetailsResponse getWeatherDetailsByDaysFallback(String days, String locationCode, Throwable throwable)
+			throws Exception {
+		throw new Exception("Error al obtener el tiempo por código");
 	}
 
 }

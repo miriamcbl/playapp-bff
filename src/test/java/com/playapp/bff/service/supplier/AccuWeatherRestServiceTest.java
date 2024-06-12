@@ -35,7 +35,7 @@ class AccuWeatherRestServiceTest {
 	void getDetailsTest() {
 		server.enqueue(new MockResponse().setStatus("HTTP/1.1 200").addHeader(HttpHeaders.CONTENT_TYPE,
 				MediaType.APPLICATION_JSON_VALUE));
-		assertDoesNotThrow(() -> restService.getDetails(""));
+		assertDoesNotThrow(() -> restService.getWeatherDetailsByDays("", ""));
 	}
 
 }
