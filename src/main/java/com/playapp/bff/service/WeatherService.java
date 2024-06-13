@@ -6,9 +6,6 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.stereotype.Service;
 
 import com.playapp.bff.bean.LocationCode;
@@ -36,19 +33,21 @@ public class WeatherService {
 	/** The weather mapper. */
 	private WeatherMapper weatherMapper;
 
-	private OpenAiChatClient chatClient;
+	/** The chat service. */
+	private ChatService chatService;
 
 	/**
 	 * Instantiates a new weather service.
 	 *
 	 * @param accuWeatherRestService the accu weather rest service
 	 * @param weatherMapper          the weather mapper
+	 * @param chatService            the chat service
 	 */
 	public WeatherService(AccuWeatherRestService accuWeatherRestService, WeatherMapper weatherMapper,
-			OpenAiChatClient chatClient) {
+			ChatService chatService) {
 		this.accuWeatherRestService = accuWeatherRestService;
 		this.weatherMapper = weatherMapper;
-		this.chatClient = chatClient;
+		this.chatService = chatService;
 	}
 
 	/**
@@ -124,14 +123,12 @@ public class WeatherService {
 			parseDetails.add("Playa: " + name + ", viento: " + wind + " km/h.");
 		});
 		log.info("Beaches parsed: " + Arrays.toString(parseDetails.toArray()));
-		Prompt prompt = new Prompt(
-				new UserMessage("Ordena esta lista en base a los km/h del viento: "
-						+ parseDetails + " y escoge a las tres mejores playas que tengan el viento más bajo"));
-		// Llamar al cliente de chat para obtener y devolver la respuesta
-		ChatResponse response = chatClient.call(prompt);
-		String assistantResponse = response.getResult().getOutput().getContent();
-		log.info("end - Beaches comparison result: " + assistantResponse);
-		return assistantResponse;
+		String message = "Ordena esta lista en base a los km/h del viento: " + parseDetails
+				+ " y escoge a las tres mejores playas que tengan el viento más bajo";
+		// Llamar al servicio de chat para obtener y devolver la respuesta
+		ChatResponse comparisonResponse = chatService.getChatResponseByPrompts(message);
+		log.info("end - Beaches comparison result: " + comparisonResponse.getResult().getOutput().getContent());
+		return comparisonResponse.getResult().getOutput().getContent();
 
 	}
 

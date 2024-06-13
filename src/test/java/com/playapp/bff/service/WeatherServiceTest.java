@@ -1,6 +1,7 @@
 package com.playapp.bff.service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -13,7 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.Generation;
 
 import com.playapp.bff.bean.LocationCode;
 import com.playapp.bff.mapper.WeatherMapper;
@@ -28,28 +30,27 @@ import com.playapp.bff.service.supplier.bean.WindSpeed;
 
 class WeatherServiceTest {
 
-	/** The accu weather rest service. */
 	@Mock
 	private AccuWeatherRestService accuWeatherRestService;
 
-	/** The weather mapper. */
 	@Mock
 	private WeatherMapper weatherMapper;
 
 	@Mock
-	private ChatClient chatClient;
+	private ChatService chatService;
 
 	@InjectMocks
 	private WeatherService service;
 
+	private String today;
+
 	@BeforeEach
 	void initMocks() {
 		MockitoAnnotations.openMocks(this);
+		LocalDate currentDate = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		today = currentDate.format(formatter);
 	}
-
-	LocalDate currentDate = LocalDate.now();
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-	String today = currentDate.format(formatter);
 
 	@Test
 	void getBeachesDataMuchWindTest() {
@@ -68,6 +69,9 @@ class WeatherServiceTest {
 
 	@Test
 	void getBeachesDataTest() {
+		Generation generation = new Generation("");
+		ChatResponse chatResponse = new ChatResponse(List.of(generation));
+		when(chatService.getChatResponseByPrompts(anyString())).thenReturn(chatResponse);
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
@@ -90,6 +94,9 @@ class WeatherServiceTest {
 	void getBeachesDataTest2() {
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
+		Generation generation = new Generation("");
+		ChatResponse chatResponse = new ChatResponse(List.of(generation));
+		when(chatService.getChatResponseByPrompts(anyString())).thenReturn(chatResponse);
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(LocationCode.builder().code("212").name("playa").build());
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
