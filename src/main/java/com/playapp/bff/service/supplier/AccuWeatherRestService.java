@@ -58,9 +58,17 @@ public class AccuWeatherRestService extends WebClientService {
 		return locationResponse;
 	}
 
+	/**
+	 * Gets the locations fallback.
+	 *
+	 * @param latitude  the latitude
+	 * @param longitude the longitude
+	 * @param exception the exception
+	 * @return the locations fallback
+	 */
 	protected LocationResponse getLocationsFallback(String latitude, String longitude,
 			WebClientResponseException exception) {
-		throw ErrorHandler.webClientHandleErrorResponse(exception, "Error al obtener los detalles del clima");
+		throw ErrorHandler.webClientHandleErrorResponse(exception, "Error al obtener las localizaciones");
 	}
 
 	/**
@@ -71,6 +79,7 @@ public class AccuWeatherRestService extends WebClientService {
 	 * @param locationCode the location code
 	 * @return the days weather details
 	 */
+	@CircuitBreaker(name = "accuweather", fallbackMethod = "getWeatherDetailsByDaysFallback")
 	public WeatherDetailsResponse getWeatherDetailsByDays(String days, String locationCode) {
 		log.info("Begin - getDetails");
 		UriComponentsBuilder builder = UriComponentsBuilder
@@ -85,9 +94,20 @@ public class AccuWeatherRestService extends WebClientService {
 		return weather;
 	}
 
-	public WeatherDetailsResponse getWeatherDetailsByDaysFallback(String days, String locationCode, Throwable throwable)
+	/**
+	 * Gets the weather details by days fallback.
+	 *
+	 * @param days         the days
+	 * @param locationCode the location code
+	 * @param exception    the exception
+	 * @return the weather details by days fallback
+	 * @throws Exception the exception
+	 */
+	protected WeatherDetailsResponse getWeatherDetailsByDaysFallback(String days, String locationCode,
+			WebClientResponseException exception)
 			throws Exception {
-		throw new Exception("Error al obtener el tiempo por código");
+		throw ErrorHandler.webClientHandleErrorResponse(exception,
+				"Error al obtener los detalles del clima según localizaciones");
 	}
 
 }
