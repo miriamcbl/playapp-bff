@@ -3,12 +3,13 @@ package com.playapp.bff.service.supplier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.playapp.bff.config.ErrorHandler;
 import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,23 +43,21 @@ public class AccuWeatherRestService extends WebClientService {
 	 * @param longitude the longitude
 	 * @return the locations
 	 */
-	@CircuitBreaker(name = "accuweather", fallbackMethod = "getLocationsFallback")
 	public LocationResponse getLocations(String latitude, String longitude) {
 		log.info("Begin - getLocations");
-		String latitudeLongitudeForQueryParam = latitude + "," + longitude;
-		UriComponentsBuilder builder = UriComponentsBuilder
-				.fromHttpUrl(url + "/locations/v1/cities/geoposition/search");
-		builder.queryParam("apikey", accuWeatherApiKey);
-		builder.queryParam("q", latitudeLongitudeForQueryParam);
-		LocationResponse locationResponse = webClient.get().uri(builder.build().encode().toUriString()).retrieve()
-				.bodyToMono(LocationResponse.class).block();
-		log.info("End - getLocations - Response: {}", locationResponse);
-		return locationResponse;
-	}
-
-	public WeatherDetailsResponse getLocationsFallback(String latitude, String longitude, Throwable throwable)
-			throws Exception {
-		throw new Exception("Error al obtener los códigos de las ubicaciones");
+		try {
+			String latitudeLongitudeForQueryParam = latitude + "," + longitude;
+			UriComponentsBuilder builder = UriComponentsBuilder
+					.fromHttpUrl(url + "/locations/v1/cities/geoposition/search");
+			builder.queryParam("apikey", accuWeatherApiKey);
+			builder.queryParam("q", latitudeLongitudeForQueryParam);
+			LocationResponse locationResponse = webClient.get().uri(builder.build().encode().toUriString()).retrieve()
+					.bodyToMono(LocationResponse.class).block();
+			log.info("End - getLocations - Response: {}", locationResponse);
+			return locationResponse;
+		} catch (WebClientResponseException ex) {
+			throw ErrorHandler.webClientHandleErrorResponse(ex, "Error al obtener los detalles del clima");
+		}
 	}
 
 	/**
@@ -69,7 +68,6 @@ public class AccuWeatherRestService extends WebClientService {
 	 * @param locationCode the location code
 	 * @return the days weather details
 	 */
-	@CircuitBreaker(name = "accuweather", fallbackMethod = "getWeatherDetailsByDaysFallback")
 	public WeatherDetailsResponse getWeatherDetailsByDays(String days, String locationCode) {
 		log.info("Begin - getDetails");
 		UriComponentsBuilder builder = UriComponentsBuilder
