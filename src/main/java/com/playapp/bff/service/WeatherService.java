@@ -84,10 +84,10 @@ public class WeatherService {
 		return weatherDetails;
 	}
 
-	private WeatherDetailsResponse getCadizInformationData(String dayCode) {
+	private WeatherDetailsResponse getCadizInformationData(String dayCodeForPrediction) {
 		WeatherDetailsResponse weatherDetailsCadiz = null;
 		LocationResponse cadizCode = accuWeatherRestService.getLocations("36.502971", "-6.276354");
-		weatherDetailsCadiz = accuWeatherRestService.getWeatherDetailsByDays(dayCode, cadizCode.getKey());
+		weatherDetailsCadiz = accuWeatherRestService.getWeatherDetailsByDays(dayCodeForPrediction, cadizCode.getKey());
 		return weatherDetailsCadiz;
 	}
 
@@ -132,12 +132,13 @@ public class WeatherService {
 
 	}
 
-	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCode) {
+	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCodeForPrediction) {
 		String finalBeaches = null;
 		// Listado con el código asociado a cada playa según AccuWeather
 		List<LocationCode> locationCodes = getLocationCodesByCoordinates();
 		// Se obtiene el tiempo/viento asociado a cada código
-		List<WeatherDetailsResponse> weatherDetails = getAllBeachWeathersByLocationCode(locationCodes, dayCode);
+		List<WeatherDetailsResponse> weatherDetails = getAllBeachWeathersByLocationCode(locationCodes,
+				dayCodeForPrediction);
 		// se comprueba si hoy hay levante en cadiz
 		boolean isLevante = CollectionUtils.isNotEmpty(weatherDetails)
 				? Arrays.stream(LevanteWind.values()).anyMatch(wind -> wind.getShortName().equals(directionWindToday))
@@ -149,20 +150,13 @@ public class WeatherService {
 	}
 
 	public String getBeachesDataByWeather(String date) {
-		String dayCode = null;
-		try {
-			dayCode = DateUtils.getDaysForAccuWeatherDetails(date);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
 		int days = DateUtils.countDaysFromToday(date);
-
 		String finalMessageResult = null;
 		String directionWindToday;
 		double kmhWindToday;
 		// Se obtiene el tiempo y viento actual en la provincia de Cádiz
-		WeatherDetailsResponse weatherDetailsCadiz = getCadizInformationData(dayCode);
+		WeatherDetailsResponse weatherDetailsCadiz = getCadizInformationData(dayCodeForPrediction);
 		boolean exists = existsDayAndWindInWeatherDetails(weatherDetailsCadiz);
 		if (exists) {
 			// que dirección de viento hace hoy
@@ -174,7 +168,7 @@ public class WeatherService {
 							.getValue());
 			finalMessageResult = kmhWindToday > 30.0
 					? Constants.WIND_SUPERIOR_30
-					: getFinalBeachesByDirectionWind(directionWindToday, dayCode);
+					: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction);
 		} else {
 			finalMessageResult = Constants.CANNOT_CONNECT_API;
 		}

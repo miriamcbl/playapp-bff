@@ -44,7 +44,7 @@ public class AccuWeatherRestService extends WebClientService {
 	 * @param longitude the longitude
 	 * @return the locations
 	 */
-	@CircuitBreaker(name = "accuweather", fallbackMethod = "getLocationsFallback")
+	@CircuitBreaker(name = "playapp", fallbackMethod = "getLocationsFallback")
 	public LocationResponse getLocations(String latitude, String longitude) {
 		log.info("Begin - getLocations");
 		String latitudeLongitudeForQueryParam = latitude + "," + longitude;
@@ -79,7 +79,7 @@ public class AccuWeatherRestService extends WebClientService {
 	 * @param locationCode the location code
 	 * @return the days weather details
 	 */
-	@CircuitBreaker(name = "accuweather", fallbackMethod = "getWeatherDetailsByDaysFallback")
+	@CircuitBreaker(name = "playapp", fallbackMethod = "getWeatherDetailsByDaysFallback")
 	public WeatherDetailsResponse getWeatherDetailsByDays(String days, String locationCode) {
 		log.info("Begin - getDetails");
 		UriComponentsBuilder builder = UriComponentsBuilder
