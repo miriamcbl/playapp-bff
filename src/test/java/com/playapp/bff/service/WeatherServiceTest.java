@@ -158,4 +158,30 @@ class WeatherServiceTest {
 		assertNotNull(service.getBeachesDataByWeather(today));
 	}
 
+	@Test
+	void getBeachesDataSpecialConditionTest5() {
+		Generation generation = new Generation("");
+		ChatResponse chatResponse = new ChatResponse(List.of(generation));
+		when(chatService.getChatResponseByPrompts(anyString())).thenReturn(chatResponse);
+		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
+				.thenReturn(LocationResponse.builder().key("12").build());
+		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(LocationCode.builder().code("213").name("PLAYA_DE_BOLONIA").build());
+		List<DailyForecast> forecasts = new ArrayList<>();
+		DailyForecast forecast = DailyForecast.builder()
+				.day(DayDetails.builder()
+						.wind(Wind.builder().direction(WindDirection.builder().localized("OSO").build())
+								.speed(WindSpeed.builder().value(10.0).build()).build())
+						.windGust(Wind.builder().direction(WindDirection.builder().localized("OSO").build())
+								.speed(WindSpeed.builder().value(10.0).build()).build())
+						.build())
+				.build();
+		forecasts.add(forecast);
+		WeatherDetailsResponse responseWeather = WeatherDetailsResponse.builder().beachName("PLAYA_DE_BOLONIA")
+				.dailyForecasts(forecasts).build();
+		when(accuWeatherRestService.getWeatherDetailsByDays(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(responseWeather);
+		assertNotNull(service.getBeachesDataByWeather(today));
+	}
+
 }

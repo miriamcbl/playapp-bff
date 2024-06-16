@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.ai.retry.NonTransientAiException;
@@ -15,22 +14,23 @@ import org.springframework.web.server.ResponseStatusException;
 
 class ErrorHandlerTest {
 
-	@Test
 	@ParameterizedTest
 	@EnumSource(value = HttpStatus.class, names = { "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "METHOD_NOT_ALLOWED",
 			"REQUEST_TIMEOUT", "INTERNAL_SERVER_ERROR", "BAD_GATEWAY", "SERVICE_UNAVAILABLE", "GATEWAY_TIMEOUT" })
-	public void webClientHandleErrorResponseTest() {
+	public void webClientHandleErrorResponseTest(HttpStatus httpStatus) {
 		WebClientResponseException ex = mock(WebClientResponseException.class);
-		when(ex.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+		when(ex.getStatusCode()).thenReturn(httpStatus);
 		String customMessage = "";
 		ResponseStatusException responseStatusException = ErrorHandler.webClientHandleErrorResponse(ex, customMessage);
 		assertEquals(customMessage, responseStatusException.getReason());
 	}
 
-	@Test
-	public void chatHandleErrorResponseTest() {
+	@ParameterizedTest
+	@EnumSource(value = HttpStatus.class, names = { "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "METHOD_NOT_ALLOWED",
+			"REQUEST_TIMEOUT", "INTERNAL_SERVER_ERROR", "BAD_GATEWAY", "SERVICE_UNAVAILABLE", "GATEWAY_TIMEOUT" })
+	public void chatHandleErrorResponseTest(HttpStatus httpStatus) {
 		NonTransientAiException ex = mock(NonTransientAiException.class);
-		when(ex.getMessage()).thenReturn("404 message error");
+		when(ex.getMessage()).thenReturn(httpStatus.value() + "message");
 		String customMessage = "";
 		ResponseStatusException responseStatusException = ErrorHandler.chatHandleErrorResponse(ex, customMessage);
 		assertTrue(responseStatusException.getReason().contains(customMessage));
