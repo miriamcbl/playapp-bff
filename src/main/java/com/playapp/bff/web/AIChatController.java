@@ -11,7 +11,7 @@ import com.playapp.bff.service.ChatService;
 /**
  * The Class AIChatController.
  */
-@CrossOrigin
+@CrossOrigin(origins = "${cors.allowed.origins}")
 @RestController
 public class AIChatController {
 
