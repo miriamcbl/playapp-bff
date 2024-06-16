@@ -9,6 +9,10 @@ import com.playapp.bff.constants.ErrorConstants;
 
 public class DateUtils {
 
+	private DateUtils() {
+		super();
+	}
+
 	/**
 	 * Gets the days for accu weather prediction.
 	 *

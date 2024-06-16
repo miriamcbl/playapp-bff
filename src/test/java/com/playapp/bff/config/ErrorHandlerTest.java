@@ -17,7 +17,7 @@ class ErrorHandlerTest {
 	@ParameterizedTest
 	@EnumSource(value = HttpStatus.class, names = { "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "METHOD_NOT_ALLOWED",
 			"REQUEST_TIMEOUT", "INTERNAL_SERVER_ERROR", "BAD_GATEWAY", "SERVICE_UNAVAILABLE", "GATEWAY_TIMEOUT" })
-	public void webClientHandleErrorResponseTest(HttpStatus httpStatus) {
+	void webClientHandleErrorResponseTest(HttpStatus httpStatus) {
 		WebClientResponseException ex = mock(WebClientResponseException.class);
 		when(ex.getStatusCode()).thenReturn(httpStatus);
 		String customMessage = "";
@@ -28,7 +28,7 @@ class ErrorHandlerTest {
 	@ParameterizedTest
 	@EnumSource(value = HttpStatus.class, names = { "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "METHOD_NOT_ALLOWED",
 			"REQUEST_TIMEOUT", "INTERNAL_SERVER_ERROR", "BAD_GATEWAY", "SERVICE_UNAVAILABLE", "GATEWAY_TIMEOUT" })
-	public void chatHandleErrorResponseTest(HttpStatus httpStatus) {
+	void chatHandleErrorResponseTest(HttpStatus httpStatus) {
 		NonTransientAiException ex = mock(NonTransientAiException.class);
 		when(ex.getMessage()).thenReturn(httpStatus.value() + "message");
 		String customMessage = "";

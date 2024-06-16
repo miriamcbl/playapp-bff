@@ -14,14 +14,14 @@ import com.playapp.bff.constants.ErrorConstants;
 class DateUtilsTest {
 
 	@Test
-	public void getDaysForAccuWeatherPredictionTodayTest() {
+	void getDaysForAccuWeatherPredictionTodayTest() {
 		LocalDate today = LocalDate.now();
 		String todayStr = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		assertEquals(Constants.ONE_DAY_PREDICTION, DateUtils.getDaysForAccuWeatherPrediction(todayStr));
 	}
 
 	@Test
-	public void getDaysForAccuWeatherPredictionWithinFiveDaysTest() {
+	void getDaysForAccuWeatherPredictionWithinFiveDaysTest() {
 		LocalDate today = LocalDate.now();
 		LocalDate withinFiveDays = today.plusDays(3);
 		String withinFiveDaysStr = withinFiveDays.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -29,7 +29,7 @@ class DateUtilsTest {
 	}
 
 	@Test
-	public void getDaysForAccuWeatherPredictionBeyondFiveDaysTest() {
+	void getDaysForAccuWeatherPredictionBeyondFiveDaysTest() {
 		LocalDate today = LocalDate.now();
 		LocalDate beyondFiveDays = today.plusDays(6);
 		String beyondFiveDaysStr = beyondFiveDays.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -40,7 +40,7 @@ class DateUtilsTest {
 	}
 
 	@Test
-	public void getDaysForAccuWeatherPredictionPastDateTest() {
+	void getDaysForAccuWeatherPredictionPastDateTest() {
 		LocalDate today = LocalDate.now();
 		LocalDate pastDate = today.minusDays(1);
 		String pastDateStr = pastDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -51,7 +51,7 @@ class DateUtilsTest {
 	}
 
 	@Test
-	public void countDaysFromTodayValidTest() {
+	void countDaysFromTodayValidTest() {
 		LocalDate today = LocalDate.now();
 		LocalDate futureDate = today.plusDays(3);
 		String futureDateStr = futureDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -59,7 +59,7 @@ class DateUtilsTest {
 	}
 
 	@Test
-	public void countDaysFromTodayPastDateTest() {
+	void countDaysFromTodayPastDateTest() {
 		LocalDate today = LocalDate.now();
 		LocalDate pastDate = today.minusDays(1);
 		String pastDateStr = pastDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -70,7 +70,7 @@ class DateUtilsTest {
 	}
 
 	@Test
-	public void countDaysFromTodayBeyondFiveDaysTest() {
+	void countDaysFromTodayBeyondFiveDaysTest() {
 		LocalDate today = LocalDate.now();
 		LocalDate beyondFiveDays = today.plusDays(6);
 		String beyondFiveDaysStr = beyondFiveDays.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));

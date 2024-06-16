@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class ErrorResponseTest {
 
 	@Test
-	public void builderTest() {
+	void builderTest() {
 		LocalDateTime now = LocalDateTime.of(2024, 06, 13, 4, 30);
 		ErrorResponse response = ErrorResponse.builder().customizedMessage("").error("").status(0).timestamp(now)
 				.build();
@@ -20,7 +20,8 @@ class ErrorResponseTest {
 		assertEquals("", response.getError());
 	}
 
-	public void gettersAndSettersTest() {
+	@Test
+	void gettersAndSettersTest() {
 		ErrorResponse response = new ErrorResponse();
 		response.setCustomizedMessage("");
 		response.setStatus(404);

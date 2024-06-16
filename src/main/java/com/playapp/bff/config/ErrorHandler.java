@@ -7,6 +7,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class ErrorHandler {
 
+	private ErrorHandler() {
+		super();
+	}
+
 	/**
 	 * Gets the exception.
 	 *
@@ -61,7 +65,7 @@ public class ErrorHandler {
 	 * @return the response status exception
 	 */
 	public static ResponseStatusException chatHandleErrorResponse(NonTransientAiException ex, String customMessage) {
-		int status = Integer.valueOf(ex.getMessage().substring(0, 3));
+		int status = Integer.parseInt(ex.getMessage().substring(0, 3));
 		int indexMessage = ex.getMessage().indexOf("message");
 		String exceptionMessage = ex.getMessage().substring(indexMessage).replace("\n", "").replace("\"", "").trim();
 		return getException(status, customMessage + ", " + exceptionMessage, ex);

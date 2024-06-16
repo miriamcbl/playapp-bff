@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class BasicErrorResponseTest {
 
 	@Test
-	public void allArgsConstructorTest() {
+	void allArgsConstructorTest() {
 		LocalDateTime now = LocalDateTime.now();
 		BasicErrorResponse response = new BasicErrorResponse(now, "");
 
@@ -19,7 +19,7 @@ class BasicErrorResponseTest {
 	}
 
 	@Test
-	public void noArgsConstructorTest() {
+	void noArgsConstructorTest() {
 		BasicErrorResponse response = new BasicErrorResponse();
 
 		assertNull(response.getTimestamp());
@@ -34,7 +34,7 @@ class BasicErrorResponseTest {
 	}
 
 	@Test
-	public void builderTest() {
+	void builderTest() {
 		LocalDateTime now = LocalDateTime.now();
 		BasicErrorResponse response = BasicErrorResponse.builder().timestamp(now).customizedMessage("Test Message")
 				.build();
@@ -44,7 +44,7 @@ class BasicErrorResponseTest {
 	}
 
 	@Test
-	public void gettersAndSettersTest() {
+	void gettersAndSettersTest() {
 		BasicErrorResponse response = new BasicErrorResponse();
 		LocalDateTime now = LocalDateTime.now();
 

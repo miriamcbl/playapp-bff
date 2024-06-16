@@ -104,8 +104,7 @@ public class AccuWeatherRestService extends WebClientService {
 	 * @throws Exception the exception
 	 */
 	protected WeatherDetailsResponse getWeatherDetailsByDaysFallback(String days, String locationCode,
-			WebClientResponseException exception)
-			throws Exception {
+			WebClientResponseException exception) {
 		throw ErrorHandler.webClientHandleErrorResponse(exception,
 				"Error al obtener los detalles del clima según localizaciones");
 	}
