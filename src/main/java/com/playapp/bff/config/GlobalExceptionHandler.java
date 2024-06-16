@@ -23,8 +23,8 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ResponseStatusException.class)
 	public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException ex) {
 		int status = ex.getStatusCode().value();
-		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), status, HttpStatus.valueOf(status).name(),
-				ex.getReason());
+		ErrorResponse errorResponse = ErrorResponse.builder().timestamp(LocalDateTime.now()).status(status)
+				.error(HttpStatus.valueOf(status).name()).customizedMessage(ex.getReason()).build();
 		return new ResponseEntity<>(errorResponse, ex.getStatusCode());
 	}
 
@@ -36,14 +36,17 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
-				HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), "Ocurrió un error inesperado");
+		ErrorResponse errorResponse = ErrorResponse.builder().timestamp(LocalDateTime.now())
+				.status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+				.error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+				.customizedMessage("Ocurrió un error inesperado").build();
 		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<BasicErrorResponse> handleGenericException(IllegalArgumentException ex) {
-		BasicErrorResponse errorResponse = new BasicErrorResponse(LocalDateTime.now(), ex.getMessage());
+		BasicErrorResponse errorResponse = BasicErrorResponse.builder().timestamp(LocalDateTime.now())
+				.customizedMessage(ex.getMessage()).build();
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 

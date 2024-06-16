@@ -91,10 +91,26 @@ public class WeatherService {
 		return weatherDetailsCadiz;
 	}
 
+	/**
+	 * Verify if weatherDetails is not null and has information
+	 *
+	 * @param weatherDetails the weather details
+	 * @return true, if successful
+	 */
 	private boolean existsDayAndWindInWeatherDetails(WeatherDetailsResponse weatherDetails) {
 		return weatherDetails != null && CollectionUtils.isNotEmpty(weatherDetails.getDailyForecasts())
 				&& weatherDetails.getDailyForecasts().get(0).getDay() != null
 				&& weatherDetails.getDailyForecasts().get(0).getDay().getWind() != null;
+	}
+
+	/**
+	 * Verify if its raining.
+	 *
+	 * @param weatherDetails the weather details
+	 * @return true, if successful
+	 */
+	private boolean itsRaining(WeatherDetailsResponse weatherDetails) {
+		return weatherDetails.getDailyForecasts().get(0).getDay().isHasPrecipitation();
 	}
 
 	private String getLevanteBeaches(List<WeatherDetailsResponse> weatherDetails) {
@@ -116,6 +132,11 @@ public class WeatherService {
 
 	private String sortAndLimitFinalBeaches(List<WeatherDetailsResponse> weatherDetails) {
 		log.info("start - Beaches comparison");
+		deleteBeachesWithHighWindAndGust(weatherDetails);
+		if (CollectionUtils.isEmpty(weatherDetails)) {
+			return "Hoy hay unas ráfagas de viento muy fuertes. Mejor no vayas a la "
+					+ "playa y disfruta de un mojito en tu chiringuito de confianza";
+		}
 		List<String> parseDetails = new ArrayList<>();
 		weatherDetails.stream().forEach(details -> {
 			String name = details.getBeachName();
@@ -132,6 +153,60 @@ public class WeatherService {
 
 	}
 
+	private boolean itHasSpecialCondition(WeatherDetailsResponse weatherDetail) {
+		// Si la playa es "Tarifa, Bolonia..." el km/h del
+		// windGust debe ser menor
+		return Arrays.stream(GeographicCoordinates.values()).anyMatch(
+				beach -> beach.name().equals(weatherDetail.getBeachName()) && beach.getSpecialConditionForWindGust());
+	}
+
+	/**
+	 * Delete beaches with high wind gust.
+	 *
+	 * @param weatherDetails the weather details
+	 * @return the string
+	 */
+	private void deleteBeachesWithHighWindAndGust(List<WeatherDetailsResponse> weatherDetails) {
+		List<WeatherDetailsResponse> weatherDetailsWithHighWindAndGust = new ArrayList<>();
+		if (CollectionUtils.isNotEmpty(weatherDetails)) {
+			weatherDetails.stream().forEach(detail -> {
+				if (detail != null && CollectionUtils.isNotEmpty(detail.getDailyForecasts())) {
+					if (detail.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue() >= 30.0) {
+						weatherDetailsWithHighWindAndGust.add(detail);
+					} else {
+						addBeachesWithHighGustToDelete(detail, weatherDetailsWithHighWindAndGust);
+					}
+
+				}
+			});
+		}
+		if (CollectionUtils.isNotEmpty(weatherDetailsWithHighWindAndGust)) {
+			weatherDetails.removeAll(weatherDetailsWithHighWindAndGust);
+		}
+
+	}
+
+	private void addBeachesWithHighGustToDelete(WeatherDetailsResponse weatherDetails,
+			List<WeatherDetailsResponse> weatherDetailsWithHighWindAndGust) {
+		double windGust = weatherDetails.getDailyForecasts().get(0).getDay().getWindGust().getSpeed().getValue();
+		if (itHasSpecialCondition(weatherDetails)) {
+			if (windGust >= 18.0) {
+				weatherDetailsWithHighWindAndGust.add(weatherDetails);
+			}
+		} else {
+			if (windGust > 25.0) {
+				weatherDetailsWithHighWindAndGust.add(weatherDetails);
+			}
+		}
+	}
+
+	/**
+	 * Gets the final beaches by direction wind.
+	 *
+	 * @param directionWindToday   the direction wind today
+	 * @param dayCodeForPrediction the day code for prediction
+	 * @return the final beaches by direction wind
+	 */
 	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCodeForPrediction) {
 		String finalBeaches = null;
 		// Listado con el código asociado a cada playa según AccuWeather
@@ -144,11 +219,16 @@ public class WeatherService {
 				? Arrays.stream(LevanteWind.values()).anyMatch(wind -> wind.getShortName().equals(directionWindToday))
 				: Boolean.FALSE;
 		// se obtiene en base a si hay o no levante las playas finales
-		finalBeaches = isLevante ? getLevanteBeaches(weatherDetails)
-				: sortAndLimitFinalBeaches(weatherDetails);
+		finalBeaches = isLevante ? getLevanteBeaches(weatherDetails) : sortAndLimitFinalBeaches(weatherDetails);
 		return finalBeaches;
 	}
 
+	/**
+	 * Gets the beaches data by weather.
+	 *
+	 * @param date the date
+	 * @return the beaches data by weather
+	 */
 	public String getBeachesDataByWeather(String date) {
 		String dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
 		int days = DateUtils.countDaysFromToday(date);
@@ -157,20 +237,21 @@ public class WeatherService {
 		double kmhWindToday;
 		// Se obtiene el tiempo y viento actual en la provincia de Cádiz
 		WeatherDetailsResponse weatherDetailsCadiz = getCadizInformationData(dayCodeForPrediction);
-		boolean exists = existsDayAndWindInWeatherDetails(weatherDetailsCadiz);
-		if (exists) {
-			// que dirección de viento hace hoy
-			directionWindToday = weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getDirection()
-					.getLocalized();
-			// qué kmh hay hoy
-			kmhWindToday = Math
-					.round(weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getSpeed()
-							.getValue());
-			finalMessageResult = kmhWindToday > 30.0
-					? Constants.WIND_SUPERIOR_30
-					: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction);
+		if (existsDayAndWindInWeatherDetails(weatherDetailsCadiz)) {
+			if (!itsRaining(weatherDetailsCadiz)) {
+				// que dirección de viento hace hoy
+				directionWindToday = weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getDirection()
+						.getLocalized();
+				// qué kmh hay hoy
+				kmhWindToday = Math.round(
+						weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getSpeed().getValue());
+				finalMessageResult = kmhWindToday > 30.0 ? Constants.WIND_SUPERIOR_30_MESSAGE
+						: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction);
+			} else {
+				finalMessageResult = Constants.ITS_RAINING_MESSAGE;
+			}
 		} else {
-			finalMessageResult = Constants.CANNOT_CONNECT_API;
+			finalMessageResult = Constants.CANNOT_CONNECT_API_MESSAGE;
 		}
 		return finalMessageResult;
 	}

@@ -25,4 +25,7 @@ public class DayDetails {
 	/** The wind gusts. */
 	@JsonProperty("WindGust")
 	private Wind windGust;
+
+	@JsonProperty("HasPrecipitation")
+	private boolean hasPrecipitation;
 }
