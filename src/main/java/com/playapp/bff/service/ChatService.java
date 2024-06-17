@@ -3,7 +3,10 @@
  */
 package com.playapp.bff.service;
 
+import java.util.List;
+
 import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatClient;
@@ -11,7 +14,10 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.retry.NonTransientAiException;
 import org.springframework.stereotype.Service;
 
+import com.playapp.bff.bean.MessageResponse;
 import com.playapp.bff.config.ErrorHandler;
+import com.playapp.bff.constants.Constants;
+import com.playapp.bff.constants.ErrorConstants;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +65,7 @@ public class ChatService {
 	 * @return the chat response by prompts fallback
 	 */
 	protected ChatResponse getChatResponseByPromptsFallback(String message, NonTransientAiException exception) {
-		throw ErrorHandler.chatHandleErrorResponse(exception, "Error al llamar a chat usando Prompts");
+		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.PROMPTS_ERROR);
 	}
 
 	/**
@@ -85,7 +91,7 @@ public class ChatService {
 	 * @return the basic chat response fallback
 	 */
 	protected String getBasicChatResponseFallback(String message, NonTransientAiException exception) {
-		throw ErrorHandler.chatHandleErrorResponse(exception, "Error al llamar a chat básico");
+		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.BASIC_CHAT_ERROR);
 	}
 
 	/**
@@ -114,9 +120,39 @@ public class ChatService {
 	 */
 	protected String getChatResponseByPromptsOptionsFallback(String message, OpenAiChatOptions chatOptions,
 			NonTransientAiException exception) {
-		throw ErrorHandler.chatHandleErrorResponse(exception, "Error al llamar a chat usando Prompts y Options");
+		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.PROMPTS_OPTIONS_ERROR);
 	}
 
+	/**
+	 * Gets the chat response by prompts options and system.
+	 *
+	 * @param message     the message
+	 * @param chatOptions the chat options
+	 * @return the chat response by prompts options and system
+	 */
+	@CircuitBreaker(name = "playapp", fallbackMethod = "getChatResponseByPromptsOptionsAndSystemFallback")
+	public String getChatResponseByPromptsOptionsAndSystem(String message, OpenAiChatOptions chatOptions) {
+		log.info("start - getChatResponseByPromptsOptions");
+		UserMessage userMessage = new UserMessage(message);
+		SystemMessage systemMessage = new SystemMessage(Constants.LIMIT_THEMES_SYSTEM_PROMPT);
+		Prompt prompt = new Prompt(List.of(userMessage, systemMessage), chatOptions);
+		ChatResponse chatResponse = chatClient.call(prompt);
+		log.info("end - getChatResponseByPromptsOptions");
+		return chatResponse.getResult().getOutput().getContent();
+	}
+
+	/**
+	 * Gets the chat response by prompts options and system fallback.
+	 *
+	 * @param message     the message
+	 * @param chatOptions the chat options
+	 * @param exception   the exception
+	 * @return the chat response by prompts options and system fallback
+	 */
+	protected String getChatResponseByPromptsOptionsAndSystemFallback(String message, OpenAiChatOptions chatOptions,
+			NonTransientAiException exception) {
+		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.PROMPTS_OPTIONS_SYSTEM_ERROR);
+	}
 	/**
 	 * Gets the beaches recommended.
 	 *
@@ -124,16 +160,23 @@ public class ChatService {
 	 * @return the beaches recommended
 	 */
 	@CircuitBreaker(name = "playapp", fallbackMethod = "getBeachesRecommendedFallback")
-	public String getBeachesRecommended(String message) {
+	public MessageResponse getBeachesRecommended(String message) {
 		log.info("start - getBeachesRecommended - message: " + message);
 		// Definir las opciones del chat para llamar a la función "weatherFunction"
 		OpenAiChatOptions chatOptions = OpenAiChatOptions.builder().withFunction("weatherFunction").build();
-		String messageResult = getChatResponseByPromptsOptions(message, chatOptions);
+		String messageResult = getChatResponseByPromptsOptionsAndSystem(message, chatOptions);
 		log.info("end - getBeachesRecommended - messageResult: " + messageResult);
-		return messageResult;
+		return MessageResponse.builder().message(messageResult).build();
 	}
 
-	protected String getBeachesRecommendedFallback(String message, NonTransientAiException exception) {
-		throw ErrorHandler.chatHandleErrorResponse(exception, "Error al llamar a chat usando Prompts y Options");
+	/**
+	 * Gets the beaches recommended fallback.
+	 *
+	 * @param message   the message
+	 * @param exception the exception
+	 * @return the beaches recommended fallback
+	 */
+	protected MessageResponse getBeachesRecommendedFallback(String message, NonTransientAiException exception) {
+		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.PROMPTS_OPTIONS_SYSTEM_ERROR);
 	}
 }

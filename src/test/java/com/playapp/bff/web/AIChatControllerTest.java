@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.playapp.bff.bean.MessageResponse;
 import com.playapp.bff.service.ChatService;
 
 class AIChatControllerTest {
@@ -38,7 +39,8 @@ class AIChatControllerTest {
 
 	@Test
 	void getBeachesRecommendedTest() {
-		when(chatService.getBeachesRecommended(anyString())).thenReturn(expectedResult);
+		when(chatService.getBeachesRecommended(anyString()))
+				.thenReturn(MessageResponse.builder().message(expectedResult).build());
 		assertNotNull(aiChatController.getBeachesRecommended(message));
 	}
 

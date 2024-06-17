@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.playapp.bff.config.ErrorHandler;
+import com.playapp.bff.constants.ErrorConstants;
 import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 
@@ -68,7 +69,7 @@ public class AccuWeatherRestService extends WebClientService {
 	 */
 	protected LocationResponse getLocationsFallback(String latitude, String longitude,
 			WebClientResponseException exception) {
-		throw ErrorHandler.webClientHandleErrorResponse(exception, "Error al obtener las localizaciones");
+		throw ErrorHandler.webClientHandleErrorResponse(exception, ErrorConstants.LOCATIONS_ERROR);
 	}
 
 	/**
@@ -105,8 +106,7 @@ public class AccuWeatherRestService extends WebClientService {
 	 */
 	protected WeatherDetailsResponse getWeatherDetailsByDaysFallback(String days, String locationCode,
 			WebClientResponseException exception) {
-		throw ErrorHandler.webClientHandleErrorResponse(exception,
-				"Error al obtener los detalles del clima según localizaciones");
+		throw ErrorHandler.webClientHandleErrorResponse(exception, ErrorConstants.WEATHER_DETAILS_ERROR);
 	}
 
 }

@@ -14,7 +14,8 @@ pipeline {
         DOCKER_IMAGE_TAG = 'latest'
         PLAYAPP_EC2 = credentials('playapp_ec2')
         OPENAI_API_KEY = credentials('openai-api-key')
-        ACCUWEATHER_API_KEY = credentials('accuweather-api-key')        
+        ACCUWEATHER_API_KEY = credentials('accuweather-api-key')
+        PLAYAPP_EC2_FNT = credentials('playapp_ec2_fnt')        
     }
     tools {
         // Utiliza maven instalado en la maquina
@@ -67,9 +68,10 @@ pipeline {
 		            def propertiesFile = readFile(propertiesDir)
 		
 		            // Se actualiza con las secrets 
-		            propertiesFile = propertiesFile.replaceAll(/spring\.ai\.openai\.api-key=.*/, "spring.ai.openai.api-key=${OPENAI_API_KEY}")
-		            propertiesFile = propertiesFile.replaceAll(/accuweather\.apikey=.*/, "env.accuweather.apikey=${ACCUWEATHER_API_KEY}")
-		
+		            propertiesFile = propertiesFile.replaceAll(/spring\.ai\.openai\.api-key:.*/, "spring.ai.openai.api-key: ${OPENAI_API_KEY}")
+		            propertiesFile = propertiesFile.replaceAll(/accuweather\.apikey:.*/, "env.accuweather.apikey: ${ACCUWEATHER_API_KEY}")
+					propertiesFile = propertiesFile.replaceAll(/cors\.allowed\.origins:.*/,"cors.allowed.origins: ${PLAYAPP_EC2_FNT}")
+		            
 		            // se escribe todo
 		            writeFile file: propertiesDir, text: propertiesFile 
 		

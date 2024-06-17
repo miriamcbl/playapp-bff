@@ -84,6 +84,12 @@ public class WeatherService {
 		return weatherDetails;
 	}
 
+	/**
+	 * Gets the cadiz information data.
+	 *
+	 * @param dayCodeForPrediction the day code for prediction
+	 * @return the cadiz information data
+	 */
 	private WeatherDetailsResponse getCadizInformationData(String dayCodeForPrediction) {
 		WeatherDetailsResponse weatherDetailsCadiz = null;
 		LocationResponse cadizCode = accuWeatherRestService.getLocations("36.502971", "-6.276354");
@@ -132,10 +138,9 @@ public class WeatherService {
 
 	private String sortAndLimitFinalBeaches(List<WeatherDetailsResponse> weatherDetails) {
 		log.info("start - Beaches comparison");
-		deleteBeachesWithHighWindAndGust(weatherDetails);
+		// deleteBeachesWithHighWindAndGust(weatherDetails);
 		if (CollectionUtils.isEmpty(weatherDetails)) {
-			return "Hoy hay unas ráfagas de viento muy fuertes. Mejor no vayas a la "
-					+ "playa y disfruta de un mojito en tu chiringuito de confianza";
+			return Constants.GUSTS_MESSAGE;
 		}
 		List<String> parseDetails = new ArrayList<>();
 		weatherDetails.stream().forEach(details -> {
@@ -144,8 +149,7 @@ public class WeatherService {
 			parseDetails.add("Playa: " + name + ", viento: " + wind + " km/h.");
 		});
 		log.info("Beaches parsed: " + Arrays.toString(parseDetails.toArray()));
-		String message = "Ordena esta lista en base a los km/h del viento: " + parseDetails
-				+ " y escoge a las tres mejores playas que tengan el viento más bajo";
+		String message = Constants.OUTPUT_SYSTEM_PROMPT + parseDetails;
 		// Llamar al servicio de chat para obtener y devolver la respuesta
 		ChatResponse comparisonResponse = chatService.getChatResponseByPrompts(message);
 		log.info("end - Beaches comparison result: " + comparisonResponse.getResult().getOutput().getContent());

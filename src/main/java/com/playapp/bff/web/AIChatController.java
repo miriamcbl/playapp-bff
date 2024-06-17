@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.playapp.bff.bean.MessageResponse;
 import com.playapp.bff.service.ChatService;
 
 /**
@@ -41,7 +42,7 @@ public class AIChatController {
 	}
 
 	@GetMapping("/chat/getBeachesRecommended")
-	public String getBeachesRecommended(
+	public MessageResponse getBeachesRecommended(
 			@RequestParam(value = "message", defaultValue = "Dime a qué playa es mejor ir hoy en Cádiz") String message) {
 		// Llamar al cliente de chat para obtener y devolver la respuesta
 		return chatService.getBeachesRecommended(message);
