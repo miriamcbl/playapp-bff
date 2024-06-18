@@ -106,7 +106,7 @@ pipeline {
 		            // Se actualiza con las secrets 
 		            propertiesFile = propertiesFile.replaceAll('spring.ai.openai.api-key: your_api_key', "spring.ai.openai.api-key: ${OPENAI_API_KEY}")
 		            propertiesFile = propertiesFile.replaceAll('accuweather.apikey: your_api_key', "accuweather.apikey: ${ACCUWEATHER_API_KEY}")
-					propertiesFile = propertiesFile.replaceAll('cors.allowed.origins: your_front_ip', "cors.allowed.origins: http://${PLAYAPP_EC2_FNT}:80")
+					propertiesFile = propertiesFile.replaceAll('cors.allowed.origins: your_front_ip', "cors.allowed.origins: http://${PLAYAPP_EC2_FNT}")
 		            
 		            // se escribe todo
 		            writeFile file: propertiesDir, text: propertiesFile
