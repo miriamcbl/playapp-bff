@@ -21,6 +21,8 @@ public class ErrorHandler {
 	 */
 	private static ResponseStatusException getException(int status, String customMessage, Exception ex) {
 		switch (status) {
+		case 400:
+			return new ResponseStatusException(HttpStatus.BAD_REQUEST, customMessage);
 		case 401:
 			return new ResponseStatusException(HttpStatus.UNAUTHORIZED, customMessage);
 		case 403:

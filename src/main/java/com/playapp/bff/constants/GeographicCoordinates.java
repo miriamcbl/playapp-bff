@@ -29,7 +29,7 @@ public enum GeographicCoordinates {
 	// CALA_DEL_ACEITE("36.296640", "-6.132352", true),
 	// CALA_DEL_PUNTALEJO("36.296108", "-6.127186", true),
 	// PLAYA_FUENTE_DEL_GALLO("36.292123", "-6.111808", false),
-	PLAYA_LA_FONTANILA("36.288276", "-6.107432", false, false),
+	PLAYA_LA_FONTANILLA("36.288276", "-6.107432", false, false),
 	// PLAYA_DE_LOS_BATELES("36.278466", "-6.098354", false),
 	// PLAYA_PUNTALEJOS("36.264096", "-6.088808", false),
 	// PLAYA_CASTILNOVO("36.260290", "-6.086767", false),
