@@ -138,7 +138,7 @@ public class WeatherService {
 
 	private String sortAndLimitFinalBeaches(List<WeatherDetailsResponse> weatherDetails) {
 		log.info("start - Beaches comparison");
-		// deleteBeachesWithHighWindAndGust(weatherDetails);
+		deleteBeachesWithHighWindAndGust(weatherDetails);
 		if (CollectionUtils.isEmpty(weatherDetails)) {
 			return Constants.GUSTS_MESSAGE;
 		}
