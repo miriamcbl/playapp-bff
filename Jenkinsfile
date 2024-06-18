@@ -14,7 +14,8 @@ pipeline {
         DOCKER_IMAGE_TAG = 'latest'
         PLAYAPP_EC2 = credentials('playapp_ec2')
         OPENAI_API_KEY = credentials('openai-api-key')
-        ACCUWEATHER_API_KEY = credentials('accuweather-api-key')        
+        ACCUWEATHER_API_KEY = credentials('accuweather-api-key')
+        PLAYAPP_EC2_FNT = credentials('playapp_ec2_fnt')        
     }
     tools {
         // Utiliza maven instalado en la maquina
@@ -58,6 +59,29 @@ pipeline {
                 }                
             }
         }
+        stage('Security properties'){
+        	steps {
+        		script {        			
+		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
+					sh "chmod +w ${propertiesDir}"
+		            // Se lee el properties
+		            def propertiesFile = readFile(propertiesDir)
+		
+		            // Se actualiza con las secrets 
+		            propertiesFile = propertiesFile.replaceAll(/spring\.ai\.openai\.api-key:.*/, "spring.ai.openai.api-key: ${OPENAI_API_KEY}")
+		            propertiesFile = propertiesFile.replaceAll(/accuweather\.apikey:.*/, "env.accuweather.apikey: ${ACCUWEATHER_API_KEY}")
+					propertiesFile = propertiesFile.replaceAll(/cors\.allowed\.origins:.*/,"cors.allowed.origins: ${PLAYAPP_EC2_FNT}")
+		            
+		            // se escribe todo
+		            writeFile file: propertiesDir, text: propertiesFile 
+		
+		            // Leer el contenido actualizado del archivo
+		            def updatedProperties = readFile(propertiesDir)
+		            echo "Contenido actualizado del archivo:"
+		            echo updatedProperties
+        		}
+        	}
+        }
 		stage('Publish Version') {
             steps {
                 script {                
@@ -92,31 +116,7 @@ pipeline {
                     }
                 }
             }
-        }
-        stage('Security properties'){
-        	steps {
-        		script {
-        			echo 'Injecting the sensitive properties'		
-		            def propertiesDir = "${WORKSPACE}/src/main/resources/application.properties"
-					sh "chmod g+w ${propertiesDir}"
-		            // Se lee el properties
-		            def propertiesFile = readFile(propertiesDir)
-		
-		            // Se actualiza con las secrets 
-		            propertiesFile = propertiesFile.replaceAll('spring.ai.openai.api-key: your_api_key', "spring.ai.openai.api-key: ${OPENAI_API_KEY}")
-		            propertiesFile = propertiesFile.replaceAll('accuweather.apikey: your_api_key', "accuweather.apikey: ${ACCUWEATHER_API_KEY}")
-		
-		            // se escribe todo
-		            writeFile file: propertiesDir, text: propertiesFile
-		            sh '''
-	                    cd ${WORKSPACE}/target
-	                    rm *.jar
-	                    rm *.jar.original
-                	'''
-		            sh 'mvn install'
-        		}
-        	}
-        }
+        }        
         stage("Build Docker Image"){
             steps {
                 script {

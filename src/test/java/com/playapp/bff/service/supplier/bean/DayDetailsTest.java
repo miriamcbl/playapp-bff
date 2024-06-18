@@ -21,7 +21,7 @@ class DayDetailsTest {
 	void allArgsConstructorTest() {
 		Wind wind = new Wind();
 		Wind windGust = new Wind();
-		DayDetails dayDetails = new DayDetails(wind, windGust);
+		DayDetails dayDetails = new DayDetails(wind, windGust, false);
 		assertEquals(wind, dayDetails.getWind());
 		assertEquals(windGust, dayDetails.getWindGust());
 	}

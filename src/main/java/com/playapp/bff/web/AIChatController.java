@@ -1,37 +1,34 @@
 package com.playapp.bff.web;
 
-import java.util.List;
-
-import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatClient;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.playapp.bff.service.WeatherService;
-import com.playapp.bff.service.supplier.AccuWeatherRestService;
-import com.playapp.bff.service.supplier.bean.LocationResponse;
-import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
+import com.playapp.bff.bean.MessageResponse;
+import com.playapp.bff.config.CommonApiResponse;
+import com.playapp.bff.service.ChatService;
 
-import reactor.core.publisher.Flux;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * The Class AIChatController.
  */
+@CrossOrigin(origins = "${cors.allowed.origins}")
 @RestController
+@Tag(name = "chat-controller", description = "Controller to manage calls and responses to the AI")
+@RequestMapping("/v1")
 public class AIChatController {
 
-	/** The chat client. */
-	private final OpenAiChatClient chatClient;
-
-	/** The weather service. */
-	private WeatherService weatherService;
-
-	private AccuWeatherRestService accuweather;
+	/** The chat service. */
+	private ChatService chatService;
 
 	/**
 	 * Instantiates a new AI chat controller.
@@ -40,73 +37,37 @@ public class AIChatController {
 	 * @param weatherService the weather service
 	 */
 	@Autowired
-	public AIChatController(OpenAiChatClient chatClient, WeatherService weatherService,
-			AccuWeatherRestService accuweather) {
-		this.chatClient = chatClient;
-		this.weatherService = weatherService;
-		this.accuweather = accuweather;
+	public AIChatController(ChatService chatService) {
+		this.chatService = chatService;
 	}
 
-	/**
-	 * Generate.
-	 *
-	 * @param message the message
-	 * @return the string
-	 */
-	@GetMapping("/ai/generate")
-	public String generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-		return chatClient.call(message);
+	@Operation(summary = "Operation to ask the AI something", description = "Operation to ask the AI something")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK",
+					content = @Content(mediaType = "application/json", 
+							schema = @Schema(implementation = String.class))) })
+	@CommonApiResponse
+	@GetMapping("/chat/getBasicResponse")
+	public String getBasicResponse(
+			@RequestParam(value = "message", defaultValue = "Cuéntame un chiste") String message) {
+		return chatService.getBasicChatResponse(message);
 	}
 
-	/**
-	 * Generate a stream from prompts
-	 * 
-	 * @param message
-	 * @return
-	 */
-	@GetMapping("/ai/generateStream")
-	public Flux<ChatResponse> generateStream(
-			@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-		Prompt prompt = new Prompt(new UserMessage(message));
-		Flux<ChatResponse> cont = chatClient.stream(prompt);
-		return cont;
-	}
-
-	/**
-	 * Gets the weather details - just an endpoint for testing purposes.
-	 *
-	 * @return the weather details
-	 */
-	@GetMapping("/ai/getDetails")
-	public List<WeatherDetailsResponse> getWeatherDetails() {
-		return weatherService.getBeachesDataByWeather();
-	}
-
-	@GetMapping("/ai/generateMyStream")
-	public ChatResponse generateMyStream(
-			@RequestParam(value = "message", defaultValue = "Dime a qué playa es mejor ir hoy en Cádiz") String message) {
-		// Definir las opciones del chat para llamar a la función "weatherFunction"
-		OpenAiChatOptions chatOptions = OpenAiChatOptions.builder().withFunction("weatherFunction").build();
-
-		// Crear el prompt con el mensaje y las opciones del chat
-		Prompt prompt = new Prompt(new UserMessage(message), chatOptions);
-
+	@Operation(summary = "Operation to obtain the three best beaches of Cadiz given a date, "
+			+ "according to its meteorological conditions", description = "Operation to obtain "
+					+ "the three best beaches of Cadiz given a date, according to its meteorological "
+					+ "conditions, such as weather and wind. ")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK",
+					content = @Content(mediaType = "application/json", 
+							schema = @Schema(implementation = MessageResponse.class))) })
+	@CommonApiResponse
+	@GetMapping("/chat/getBeachesRecommended")
+	public MessageResponse getBeachesRecommended(
+			@RequestParam(value = "message", defaultValue = "Dime a qué playa es mejor ir hoy en Cádiz") 
+			String message) {
 		// Llamar al cliente de chat para obtener y devolver la respuesta
-		return chatClient.call(prompt);
+		return chatService.getBeachesRecommended(message);
 	}
 
-	@GetMapping("/ai/holaMundo")
-	public String getDetailsHola() {
-		return "Hola Mundo";
-	}
-
-	@GetMapping("/ai/holaMund2")
-	public String getDetailsHola2() {
-		return "Hola Mundo2";
-	}
-
-	@GetMapping("/ai/rest")
-	public LocationResponse getdetailsRest() {
-		return accuweather.getLocations("36.502971", "-6.276354");
-	}
 }

@@ -5,19 +5,25 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.ai.chat.ChatResponse;
 import org.springframework.stereotype.Service;
 
 import com.playapp.bff.bean.LocationCode;
+import com.playapp.bff.constants.Constants;
 import com.playapp.bff.constants.GeographicCoordinates;
 import com.playapp.bff.constants.LevanteWind;
 import com.playapp.bff.mapper.WeatherMapper;
 import com.playapp.bff.service.supplier.AccuWeatherRestService;
 import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
+import com.playapp.bff.util.DateUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The Class WeatherService.
  */
+@Slf4j
 @Service
 public class WeatherService {
 
@@ -27,15 +33,21 @@ public class WeatherService {
 	/** The weather mapper. */
 	private WeatherMapper weatherMapper;
 
+	/** The chat service. */
+	private ChatService chatService;
+
 	/**
 	 * Instantiates a new weather service.
 	 *
 	 * @param accuWeatherRestService the accu weather rest service
 	 * @param weatherMapper          the weather mapper
+	 * @param chatService            the chat service
 	 */
-	public WeatherService(AccuWeatherRestService accuWeatherRestService, WeatherMapper weatherMapper) {
+	public WeatherService(AccuWeatherRestService accuWeatherRestService, WeatherMapper weatherMapper,
+			ChatService chatService) {
 		this.accuWeatherRestService = accuWeatherRestService;
 		this.weatherMapper = weatherMapper;
+		this.chatService = chatService;
 	}
 
 	/**
@@ -59,32 +71,56 @@ public class WeatherService {
 	 * @param locationCodes the location codes
 	 * @return the all beach weathers by location code
 	 */
-	private List<WeatherDetailsResponse> getAllBeachWeathersByLocationCode(List<LocationCode> locationCodes) {
+	private List<WeatherDetailsResponse> getAllBeachWeathersByLocationCode(List<LocationCode> locationCodes,
+			String dayCode) {
 		List<WeatherDetailsResponse> weatherDetails = new ArrayList<>();
 		// Se obtiene relacion info del tiempo por cala (lista)
 		locationCodes.parallelStream().forEach(locationCode -> {
-			WeatherDetailsResponse weatherDetailsResponse = accuWeatherRestService.getDetails(locationCode.getCode());
+			WeatherDetailsResponse weatherDetailsResponse = accuWeatherRestService.getWeatherDetailsByDays(dayCode,
+					locationCode.getCode());
 			weatherDetailsResponse.setBeachName(locationCode.getName());
 			weatherDetails.add(weatherDetailsResponse);
 		});
 		return weatherDetails;
 	}
 
-	private WeatherDetailsResponse getCadizInformationData() {
+	/**
+	 * Gets the cadiz information data.
+	 *
+	 * @param dayCodeForPrediction the day code for prediction
+	 * @return the cadiz information data
+	 */
+	private WeatherDetailsResponse getCadizInformationData(String dayCodeForPrediction) {
 		WeatherDetailsResponse weatherDetailsCadiz = null;
 		LocationResponse cadizCode = accuWeatherRestService.getLocations("36.502971", "-6.276354");
-		weatherDetailsCadiz = accuWeatherRestService.getDetails(cadizCode.getKey());
+		weatherDetailsCadiz = accuWeatherRestService.getWeatherDetailsByDays(dayCodeForPrediction, cadizCode.getKey());
 		return weatherDetailsCadiz;
 	}
 
+	/**
+	 * Verify if weatherDetails is not null and has information
+	 *
+	 * @param weatherDetails the weather details
+	 * @return true, if successful
+	 */
 	private boolean existsDayAndWindInWeatherDetails(WeatherDetailsResponse weatherDetails) {
 		return weatherDetails != null && CollectionUtils.isNotEmpty(weatherDetails.getDailyForecasts())
 				&& weatherDetails.getDailyForecasts().get(0).getDay() != null
 				&& weatherDetails.getDailyForecasts().get(0).getDay().getWind() != null;
 	}
 
-	private List<WeatherDetailsResponse> getLevanteBeaches(List<WeatherDetailsResponse> weatherDetails) {
-		List<WeatherDetailsResponse> finalLevanteBeaches = new ArrayList<>();
+	/**
+	 * Verify if its raining.
+	 *
+	 * @param weatherDetails the weather details
+	 * @return true, if successful
+	 */
+	private boolean itsRaining(WeatherDetailsResponse weatherDetails) {
+		return weatherDetails.getDailyForecasts().get(0).getDay().isHasPrecipitation();
+	}
+
+	private String getLevanteBeaches(List<WeatherDetailsResponse> weatherDetails) {
+		String finalLevanteBeaches = null;
 		// se obtiene listado de todas las playas aptas para levante
 		List<GeographicCoordinates> levanteBeaches = Arrays.asList(GeographicCoordinates.values()).stream()
 				.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante())).toList();
@@ -100,54 +136,128 @@ public class WeatherService {
 		return finalLevanteBeaches;
 	}
 
-	private List<WeatherDetailsResponse> sortAndLimitFinalBeaches(List<WeatherDetailsResponse> weatherDetails) {
-//		if (weatherDetails.size() >= 3) {
-//			weatherDetails.sort((firstWeather, secondWeather) -> Double.compare(
-//					firstWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue(),
-//					secondWeather.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue()));
-//			return weatherDetails.subList(0, 3);
-//		} else {
-//			return weatherDetails;
-//		}
-		return weatherDetails;
+	private String sortAndLimitFinalBeaches(List<WeatherDetailsResponse> weatherDetails) {
+		log.info("start - Beaches comparison");
+		// deleteBeachesWithHighWindAndGust(weatherDetails);
+		if (CollectionUtils.isEmpty(weatherDetails)) {
+			return Constants.GUSTS_MESSAGE;
+		}
+		List<String> parseDetails = new ArrayList<>();
+		weatherDetails.stream().forEach(details -> {
+			String name = details.getBeachName();
+			String wind = String.valueOf(details.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue());
+			parseDetails.add("Playa: " + name + ", viento: " + wind + " km/h.");
+		});
+		log.info("Beaches parsed: " + Arrays.toString(parseDetails.toArray()));
+		String message = Constants.OUTPUT_SYSTEM_PROMPT + parseDetails;
+		// Llamar al servicio de chat para obtener y devolver la respuesta
+		ChatResponse comparisonResponse = chatService.getChatResponseByPrompts(message);
+		log.info("end - Beaches comparison result: " + comparisonResponse.getResult().getOutput().getContent());
+		return comparisonResponse.getResult().getOutput().getContent();
 
 	}
 
-	private List<WeatherDetailsResponse> getFinalBeachesByDirectionWind(String directionWindToday) {
-		List<WeatherDetailsResponse> finalBeaches = new ArrayList<>();
+	private boolean itHasSpecialCondition(WeatherDetailsResponse weatherDetail) {
+		// Si la playa es "Tarifa, Bolonia..." el km/h del
+		// windGust debe ser menor
+		return Arrays.stream(GeographicCoordinates.values()).anyMatch(
+				beach -> beach.name().equals(weatherDetail.getBeachName()) && beach.getSpecialConditionForWindGust());
+	}
+
+	/**
+	 * Delete beaches with high wind gust.
+	 *
+	 * @param weatherDetails the weather details
+	 * @return the string
+	 */
+	private void deleteBeachesWithHighWindAndGust(List<WeatherDetailsResponse> weatherDetails) {
+		List<WeatherDetailsResponse> weatherDetailsWithHighWindAndGust = new ArrayList<>();
+		if (CollectionUtils.isNotEmpty(weatherDetails)) {
+			weatherDetails.stream().forEach(detail -> {
+				if (detail != null && CollectionUtils.isNotEmpty(detail.getDailyForecasts())) {
+					if (detail.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue() >= 30.0) {
+						weatherDetailsWithHighWindAndGust.add(detail);
+					} else {
+						addBeachesWithHighGustToDelete(detail, weatherDetailsWithHighWindAndGust);
+					}
+
+				}
+			});
+		}
+		if (CollectionUtils.isNotEmpty(weatherDetailsWithHighWindAndGust)) {
+			weatherDetails.removeAll(weatherDetailsWithHighWindAndGust);
+		}
+
+	}
+
+	private void addBeachesWithHighGustToDelete(WeatherDetailsResponse weatherDetails,
+			List<WeatherDetailsResponse> weatherDetailsWithHighWindAndGust) {
+		double windGust = weatherDetails.getDailyForecasts().get(0).getDay().getWindGust().getSpeed().getValue();
+		if (itHasSpecialCondition(weatherDetails)) {
+			if (windGust >= 18.0) {
+				weatherDetailsWithHighWindAndGust.add(weatherDetails);
+			}
+		} else {
+			if (windGust > 25.0) {
+				weatherDetailsWithHighWindAndGust.add(weatherDetails);
+			}
+		}
+	}
+
+	/**
+	 * Gets the final beaches by direction wind.
+	 *
+	 * @param directionWindToday   the direction wind today
+	 * @param dayCodeForPrediction the day code for prediction
+	 * @return the final beaches by direction wind
+	 */
+	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCodeForPrediction) {
+		String finalBeaches = null;
 		// Listado con el código asociado a cada playa según AccuWeather
 		List<LocationCode> locationCodes = getLocationCodesByCoordinates();
 		// Se obtiene el tiempo/viento asociado a cada código
-		List<WeatherDetailsResponse> weatherDetails = getAllBeachWeathersByLocationCode(locationCodes);
+		List<WeatherDetailsResponse> weatherDetails = getAllBeachWeathersByLocationCode(locationCodes,
+				dayCodeForPrediction);
 		// se comprueba si hoy hay levante en cadiz
 		boolean isLevante = CollectionUtils.isNotEmpty(weatherDetails)
 				? Arrays.stream(LevanteWind.values()).anyMatch(wind -> wind.getShortName().equals(directionWindToday))
 				: Boolean.FALSE;
 		// se obtiene en base a si hay o no levante las playas finales
-		finalBeaches = isLevante ? getLevanteBeaches(weatherDetails)
-				: sortAndLimitFinalBeaches(weatherDetails);
+		finalBeaches = isLevante ? getLevanteBeaches(weatherDetails) : sortAndLimitFinalBeaches(weatherDetails);
 		return finalBeaches;
 	}
 
-	public List<WeatherDetailsResponse> getBeachesDataByWeather() {
-		List<WeatherDetailsResponse> finalBeaches = new ArrayList<>();
+	/**
+	 * Gets the beaches data by weather.
+	 *
+	 * @param date the date
+	 * @return the beaches data by weather
+	 */
+	public String getBeachesDataByWeather(String date) {
+		String dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
+		int days = DateUtils.countDaysFromToday(date);
+		String finalMessageResult = null;
 		String directionWindToday;
 		double kmhWindToday;
 		// Se obtiene el tiempo y viento actual en la provincia de Cádiz
-		WeatherDetailsResponse weatherDetailsCadiz = getCadizInformationData();
+		WeatherDetailsResponse weatherDetailsCadiz = getCadizInformationData(dayCodeForPrediction);
 		if (existsDayAndWindInWeatherDetails(weatherDetailsCadiz)) {
-			// que dirección de viento hace hoy
-			directionWindToday = weatherDetailsCadiz.getDailyForecasts().get(0).getDay().getWind().getDirection()
-					.getLocalized();
-			// qué kmh hay hoy
-			kmhWindToday = Math
-					.round(weatherDetailsCadiz.getDailyForecasts().get(0).getDay().getWind().getSpeed().getValue());
-			finalBeaches = kmhWindToday > 30.0 ? finalBeaches : getFinalBeachesByDirectionWind(directionWindToday);
+			if (!itsRaining(weatherDetailsCadiz)) {
+				// que dirección de viento hace hoy
+				directionWindToday = weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getDirection()
+						.getLocalized();
+				// qué kmh hay hoy
+				kmhWindToday = Math.round(
+						weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getSpeed().getValue());
+				finalMessageResult = kmhWindToday > 30.0 ? Constants.WIND_SUPERIOR_30_MESSAGE
+						: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction);
+			} else {
+				finalMessageResult = Constants.ITS_RAINING_MESSAGE;
+			}
 		} else {
-			// TODO aqui mejor lanzar excepcion "No se puede recuperar el tiempo
-			// actualmente"
+			finalMessageResult = Constants.CANNOT_CONNECT_API_MESSAGE;
 		}
-		return finalBeaches;
+		return finalMessageResult;
 	}
 
 }
