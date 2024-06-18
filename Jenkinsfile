@@ -33,8 +33,8 @@ pipeline {
         stage('Maven Build') {
             steps {
                 script {
-		    echo 'Building project with mvn'
-                    sh 'mvn install'
+		    		echo 'Building project with mvn'
+                    sh 'mvn verify'
                 }
             }
         }
@@ -84,13 +84,15 @@ pipeline {
         }
 		stage('Publish Version') {
             steps {
-                script {
+                script {                
                     echo 'Publishing new version and creating and pushing tag in GitHub'
+		    		//sh "git fetch"
+                    //sh "git tag -d \$(git tag -l)"
                     def version = params.VERSION
                     // Actualizar la versión en el archivo pom.xml
                     sh "mvn versions:set -DnewVersion=${version}"
                     // Agregar los archivos al área de preparación
-                    sh "git add ."
+                    sh "git add pom.xml"
                     // Realizar commit
                     sh "git commit -am 'Jenkins: actualización de la versión a ${version}'"
                     // Configurar la rama ascendente antes de realizar el push
@@ -114,11 +116,11 @@ pipeline {
                     }
                 }
             }
-        }
+        }        
         stage("Build Docker Image"){
             steps {
                 script {
-                    echo 'Building and puhsing docker image - Playapp'
+                    echo 'Building and pushing docker image - Playapp'
                     sh 'ls -l target/*jar'
                     sh "docker build  --build-arg JAR_FILE=target/*.jar -t ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_IMAGE_TAG} ."
                     //sh "docker tag ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_IMAGE_TAG} ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${DOCKER_IMAGE_TAG}"
@@ -144,11 +146,16 @@ pipeline {
                         // Baja los últimos cambios subidos
                         sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerPullCmd}'"
                         // Verificar si el contenedor está en ejecución antes de detenerlo
-                        def checkContainerCmd = "docker ps --filter name=playapp_backend --format {{.Names}}"   
-                        def checkExistsContainer = sh(script: "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${checkContainerCmd}'", returnStdout: true).trim()
-                        if (checkExistsContainer == 'playapp_backend') {
-                            echo "Existe contenedor activo, se procede a parar y eliminar"
+                        def checkContainerRunningCmd = "docker ps --filter name=playapp_backend --format {{.Names}}"
+                        def checkContainerCreatedCmd = "docker ps -a --filter name=playapp_backend --format {{.Names}}"   
+                        def checkExistsContainerRunning = sh(script: "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${checkContainerRunningCmd}'", returnStdout: true).trim()
+                        def checkExistsContainerCreated = sh(script: "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${checkContainerCreatedCmd}'", returnStdout: true).trim()
+                        if (checkExistsContainerRunning == 'playapp_backend') {
+                            echo "Existe contenedor activo, se procede parar"
                             sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerStopCmd}'"
+                        }
+                        if (checkExistsContainerCreated == 'playapp_backend'){
+                        	echo "Existe contenedor creado, se elimina"
                             sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerRmvCmd}'"
                         }
                         sh "ssh -o StrictHostKeyChecking=no ${PLAYAPP_EC2} '${dockerRunCmd}'"

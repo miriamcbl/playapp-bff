@@ -1,6 +1,9 @@
 # Java21 de amazon AWS
 FROM amazoncorretto:21
 
+RUN yum install -y iputils
+RUN yum install -y procps
+
 # Argumento de entrada por comando
 ARG JAR_FILE
 
@@ -14,4 +17,4 @@ COPY ${JAR_FILE} app.jar
 RUN chmod +x app.jar
 
 # Ejecuta app jar
-CMD ["java", "-jar", "/app.jar"]
+CMD ["java", "-jar", "/app.jar", ">>", "/var/log/app.log", "2>&1"]
