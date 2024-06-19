@@ -1,11 +1,13 @@
-/*
- * 
- */
 package com.playapp.bff.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -20,6 +22,7 @@ import com.playapp.bff.constants.Constants;
 import com.playapp.bff.constants.ErrorConstants;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,6 +35,9 @@ public class ChatService {
 	/** The chat client. */
 	private OpenAiChatClient chatClient;
 
+	/** The message history. */
+	private List<Message> messageHistory = new ArrayList<>();
+
 	/**
 	 * Instantiates a new chat service.
 	 *
@@ -39,6 +45,44 @@ public class ChatService {
 	 */
 	public ChatService(OpenAiChatClient chatClient) {
 		this.chatClient = chatClient;
+	}
+
+	@PostConstruct
+	private void configAISystem() {
+		addMessageToHistory(MessageType.SYSTEM.getValue(), Constants.LIMIT_THEMES_SYSTEM_PROMPT);
+	}
+
+	/**
+	 * Adds the message to history.
+	 *
+	 * @param role    the role
+	 * @param content the content
+	 */
+	private void addMessageToHistory(String role, String content) {
+		// según el rol que sea
+		MessageType messageType = MessageType.fromValue(role);
+		switch (messageType) {
+		case ASSISTANT:
+			messageHistory.add(new AssistantMessage(content));
+			break;
+		case SYSTEM:
+			messageHistory.add(new SystemMessage(content));
+			break;
+		case USER:
+			messageHistory.add(new UserMessage(content));
+			break;
+		default:
+		}
+	}
+
+	/**
+	 * Gets the message history.
+	 *
+	 * @return the message history
+	 */
+	private List<Message> getMessageHistory() {
+		// devolvemos una copia en lugar del chat real, por seguridad
+		return new ArrayList<>(messageHistory);
 	}
 
 	/**
@@ -131,11 +175,9 @@ public class ChatService {
 	 * @return the chat response by prompts options and system
 	 */
 	@CircuitBreaker(name = "playapp", fallbackMethod = "getChatResponseByPromptsOptionsAndSystemFallback")
-	public String getChatResponseByPromptsOptionsAndSystem(String message, OpenAiChatOptions chatOptions) {
+	public String getChatResponseByPromptsOptionsAndSystem(OpenAiChatOptions chatOptions) {
 		log.info("start - getChatResponseByPromptsOptions");
-		UserMessage userMessage = new UserMessage(message);
-		SystemMessage systemMessage = new SystemMessage(Constants.LIMIT_THEMES_SYSTEM_PROMPT);
-		Prompt prompt = new Prompt(List.of(userMessage, systemMessage), chatOptions);
+		Prompt prompt = new Prompt(messageHistory, chatOptions);
 		ChatResponse chatResponse = chatClient.call(prompt);
 		log.info("end - getChatResponseByPromptsOptions");
 		return chatResponse.getResult().getOutput().getContent();
@@ -153,6 +195,7 @@ public class ChatService {
 			NonTransientAiException exception) {
 		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.PROMPTS_OPTIONS_SYSTEM_ERROR);
 	}
+
 	/**
 	 * Gets the beaches recommended.
 	 *
@@ -162,9 +205,12 @@ public class ChatService {
 	@CircuitBreaker(name = "playapp", fallbackMethod = "getBeachesRecommendedFallback")
 	public MessageResponse getBeachesRecommended(String message) {
 		log.info("start - getBeachesRecommended - message: " + message);
+		addMessageToHistory(MessageType.USER.getValue(), message);
 		// Definir las opciones del chat para llamar a la función "weatherFunction"
 		OpenAiChatOptions chatOptions = OpenAiChatOptions.builder().withFunction("weatherFunction").build();
-		String messageResult = getChatResponseByPromptsOptionsAndSystem(message, chatOptions);
+		String messageResult = getChatResponseByPromptsOptionsAndSystem(chatOptions);
+		addMessageToHistory(MessageType.ASSISTANT.getValue(), messageResult);
+		log.info("CHAT MESSAGES: " + Arrays.toString(getMessageHistory().toArray()));
 		log.info("end - getBeachesRecommended - messageResult: " + messageResult);
 		return MessageResponse.builder().message(messageResult).build();
 	}
