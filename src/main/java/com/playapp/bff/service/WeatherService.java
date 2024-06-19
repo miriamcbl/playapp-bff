@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.playapp.bff.bean.LocationCode;
 import com.playapp.bff.constants.Constants;
+import com.playapp.bff.constants.ErrorConstants;
 import com.playapp.bff.constants.GeographicCoordinates;
 import com.playapp.bff.constants.LevanteWind;
 import com.playapp.bff.mapper.WeatherMapper;
@@ -234,9 +235,14 @@ public class WeatherService {
 	 * @return the beaches data by weather
 	 */
 	public String getBeachesDataByWeather(String date) {
-		String dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
-		int days = DateUtils.countDaysFromToday(date);
+		String dayCodeForPrediction = null;
 		String finalMessageResult = null;
+		try{
+			dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
+		} catch (IllegalArgumentException e) {
+			return ErrorConstants.DATE_ERROR_PROMPT;
+		}
+		int days = DateUtils.countDaysFromToday(date);
 		String directionWindToday;
 		double kmhWindToday;
 		// Se obtiene el tiempo y viento actual en la provincia de Cádiz
