@@ -18,6 +18,8 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
 
+import jakarta.servlet.http.HttpSession;
+
 class ChatServiceTest {
 
 	@InjectMocks
@@ -25,6 +27,9 @@ class ChatServiceTest {
 
 	@Mock
 	private OpenAiChatClient chatClient;
+
+	@Mock
+	HttpSession httpSession;
 
 	@BeforeEach
 	void initMocks() {
@@ -59,7 +64,7 @@ class ChatServiceTest {
 		Generation generation = new Generation("");
 		ChatResponse chatResponse = new ChatResponse(List.of(generation));
 		when(chatClient.call(any(Prompt.class))).thenReturn(chatResponse);
-		assertNotNull(chatService.getBeachesRecommended(""));
+		assertNotNull(chatService.getBeachesRecommended("", httpSession));
 	}
 
 }
