@@ -1,5 +1,6 @@
 package com.playapp.bff.session;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,10 @@ import com.playapp.bff.constants.Constants;
 /**
  * The Class UserSession.
  */
-public class UserSession {
+public class UserSession implements Serializable {
+
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 1L;
 
 	/** The message history. */
 	private List<Message> messageHistory = new ArrayList<>();
