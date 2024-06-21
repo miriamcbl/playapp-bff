@@ -21,7 +21,7 @@ public class UserSession implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/** The message history. */
-	private List<Message> messageHistory = new ArrayList<>();
+	private transient List<Message> messageHistory = new ArrayList<>();
 
 	/**
 	 * Instantiates a new user session.
