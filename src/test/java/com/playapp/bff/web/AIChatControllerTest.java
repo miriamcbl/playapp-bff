@@ -1,6 +1,7 @@
 package com.playapp.bff.web;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,8 @@ import org.mockito.MockitoAnnotations;
 
 import com.playapp.bff.bean.MessageResponse;
 import com.playapp.bff.service.ChatService;
+
+import jakarta.servlet.http.HttpSession;
 
 class AIChatControllerTest {
 
@@ -39,9 +42,10 @@ class AIChatControllerTest {
 
 	@Test
 	void getBeachesRecommendedTest() {
-		when(chatService.getBeachesRecommended(anyString()))
+		when(chatService.getBeachesRecommended(anyString(), any()))
 				.thenReturn(MessageResponse.builder().message(expectedResult).build());
-		assertNotNull(aiChatController.getBeachesRecommended(message));
+		HttpSession httpSession = null;
+		assertNotNull(aiChatController.getBeachesRecommended(message, httpSession));
 	}
 
 }

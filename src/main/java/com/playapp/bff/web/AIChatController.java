@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * The Class AIChatController.
@@ -64,10 +65,10 @@ public class AIChatController {
 	@CommonApiResponse
 	@GetMapping("/chat/getBeachesRecommended")
 	public MessageResponse getBeachesRecommended(
-			@RequestParam(value = "message", defaultValue = "Dime a qué playa es mejor ir hoy en Cádiz") 
-			String message) {
+			@RequestParam(value = "message", required = true, defaultValue = "Dime a qué playa es mejor ir hoy en Cádiz") 
+			String message, HttpSession session) {
 		// Llamar al cliente de chat para obtener y devolver la respuesta
-		return chatService.getBeachesRecommended(message);
+		return chatService.getBeachesRecommended(message, session);
 	}
 
 }

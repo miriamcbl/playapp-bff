@@ -1,14 +1,9 @@
 package com.playapp.bff.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
-import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatClient;
@@ -18,11 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.playapp.bff.bean.MessageResponse;
 import com.playapp.bff.config.ErrorHandler;
-import com.playapp.bff.constants.Constants;
 import com.playapp.bff.constants.ErrorConstants;
+import com.playapp.bff.session.UserSession;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,9 +30,6 @@ public class ChatService {
 	/** The chat client. */
 	private OpenAiChatClient chatClient;
 
-	/** The message history. */
-	private List<Message> messageHistory = new ArrayList<>();
-
 	/**
 	 * Instantiates a new chat service.
 	 *
@@ -45,44 +37,6 @@ public class ChatService {
 	 */
 	public ChatService(OpenAiChatClient chatClient) {
 		this.chatClient = chatClient;
-	}
-
-	@PostConstruct
-	private void configAISystem() {
-		addMessageToHistory(MessageType.SYSTEM.getValue(), Constants.LIMIT_THEMES_SYSTEM_PROMPT);
-	}
-
-	/**
-	 * Adds the message to history.
-	 *
-	 * @param role    the role
-	 * @param content the content
-	 */
-	private void addMessageToHistory(String role, String content) {
-		// según el rol que sea
-		MessageType messageType = MessageType.fromValue(role);
-		switch (messageType) {
-		case ASSISTANT:
-			messageHistory.add(new AssistantMessage(content));
-			break;
-		case SYSTEM:
-			messageHistory.add(new SystemMessage(content));
-			break;
-		case USER:
-			messageHistory.add(new UserMessage(content));
-			break;
-		default:
-		}
-	}
-
-	/**
-	 * Gets the message history.
-	 *
-	 * @return the message history
-	 */
-	private List<Message> getMessageHistory() {
-		// devolvemos una copia en lugar del chat real, por seguridad
-		return new ArrayList<>(messageHistory);
 	}
 
 	/**
@@ -174,10 +128,10 @@ public class ChatService {
 	 * @param chatOptions the chat options
 	 * @return the chat response by prompts options and system
 	 */
-	@CircuitBreaker(name = "playapp", fallbackMethod = "getChatResponseByPromptsOptionsAndSystemFallback")
-	public String getChatResponseByPromptsOptionsAndSystem(OpenAiChatOptions chatOptions) {
+	@CircuitBreaker(name = "playapp", fallbackMethod = "getChatResponseByPromptsOptionsAndSessionFallback")
+	public String getChatResponseByPromptsOptionsAndSession(OpenAiChatOptions chatOptions, UserSession session) {
 		log.info("start - getChatResponseByPromptsOptions");
-		Prompt prompt = new Prompt(messageHistory, chatOptions);
+		Prompt prompt = new Prompt(session.getMessageHistory(), chatOptions);
 		ChatResponse chatResponse = chatClient.call(prompt);
 		log.info("end - getChatResponseByPromptsOptions");
 		return chatResponse.getResult().getOutput().getContent();
@@ -191,7 +145,8 @@ public class ChatService {
 	 * @param exception   the exception
 	 * @return the chat response by prompts options and system fallback
 	 */
-	protected String getChatResponseByPromptsOptionsAndSystemFallback(String message, OpenAiChatOptions chatOptions,
+	protected String getChatResponseByPromptsOptionsAndSessionFallback(OpenAiChatOptions chatOptions,
+			UserSession session,
 			NonTransientAiException exception) {
 		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.PROMPTS_OPTIONS_SYSTEM_ERROR);
 	}
@@ -203,14 +158,19 @@ public class ChatService {
 	 * @return the beaches recommended
 	 */
 	@CircuitBreaker(name = "playapp", fallbackMethod = "getBeachesRecommendedFallback")
-	public MessageResponse getBeachesRecommended(String message) {
+	public MessageResponse getBeachesRecommended(String message, HttpSession session) {
 		log.info("start - getBeachesRecommended - message: " + message);
-		addMessageToHistory(MessageType.USER.getValue(), message);
+		UserSession userSession = (UserSession) session.getAttribute("userSession");
+		if (userSession == null) {
+			userSession = new UserSession();
+			session.setAttribute("userSession", userSession);
+		}
+		userSession.addMessageToHistory(MessageType.USER.getValue(), message);
 		// Definir las opciones del chat para llamar a la función "weatherFunction"
 		OpenAiChatOptions chatOptions = OpenAiChatOptions.builder().withFunction("weatherFunction").build();
-		String messageResult = getChatResponseByPromptsOptionsAndSystem(chatOptions);
-		addMessageToHistory(MessageType.ASSISTANT.getValue(), messageResult);
-		log.info("CHAT MESSAGES: " + Arrays.toString(getMessageHistory().toArray()));
+		String messageResult = getChatResponseByPromptsOptionsAndSession(chatOptions, userSession);
+		userSession.addMessageToHistory(MessageType.ASSISTANT.getValue(), messageResult);
+		log.info("CHAT MESSAGES: " + Arrays.toString(userSession.getMessageHistory().toArray()));
 		log.info("end - getBeachesRecommended - messageResult: " + messageResult);
 		return MessageResponse.builder().message(messageResult).build();
 	}
@@ -219,10 +179,12 @@ public class ChatService {
 	 * Gets the beaches recommended fallback.
 	 *
 	 * @param message   the message
+	 * @param session   the session
 	 * @param exception the exception
 	 * @return the beaches recommended fallback
 	 */
-	protected MessageResponse getBeachesRecommendedFallback(String message, NonTransientAiException exception) {
+	protected MessageResponse getBeachesRecommendedFallback(String message, HttpSession session,
+			NonTransientAiException exception) {
 		throw ErrorHandler.chatHandleErrorResponse(exception, ErrorConstants.PROMPTS_OPTIONS_SYSTEM_ERROR);
 	}
 }
