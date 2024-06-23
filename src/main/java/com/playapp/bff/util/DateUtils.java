@@ -24,7 +24,6 @@ public class DateUtils {
 		LocalDate dateFormatted = LocalDate.parse(date, formatter);
 		LocalDate today = LocalDate.now();
 		LocalDate fiveDaysLater = today.plusDays(5);
-
 		if (today.toString().equals(dateFormatted.toString())) {
 			return Constants.ONE_DAY_PREDICTION;
 		} else {
@@ -55,6 +54,28 @@ public class DateUtils {
 			throw new IllegalArgumentException(ErrorConstants.DAYS_ERROR);
 		}
 		return daysBetween;
+	}
+
+	/**
+	 * Checks if is this year.
+	 *
+	 * @param date the date
+	 * @return true, if is this year
+	 */
+	public static boolean isNotThisYear(String date) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate dateFormatted = LocalDate.parse(date, formatter);
+		int actualYear = LocalDate.now().getYear();
+		int yearDateFormatted = dateFormatted.getYear();
+		return actualYear != yearDateFormatted;
+	}
+
+	public static boolean dateHasYear(String date) {
+		return date.length() > 6 && date.length() <= 10;
+	}
+
+	public static String addActualYear(String date) {
+		return date + "/" + String.valueOf(LocalDate.now().getYear());
 	}
 
 }

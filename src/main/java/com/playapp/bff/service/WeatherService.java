@@ -237,7 +237,12 @@ public class WeatherService {
 	public String getBeachesDataByWeather(String date) {
 		String dayCodeForPrediction = null;
 		String finalMessageResult = null;
-		try{
+		if (DateUtils.dateHasYear(date) && DateUtils.isNotThisYear(date)) {
+			return ErrorConstants.DATE_ERROR_PROMPT;
+		} else {
+			date = DateUtils.addActualYear(date);
+		}
+		try {
 			dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
 		} catch (IllegalArgumentException e) {
 			return ErrorConstants.DATE_ERROR_PROMPT;
