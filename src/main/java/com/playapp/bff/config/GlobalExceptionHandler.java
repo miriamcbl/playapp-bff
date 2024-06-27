@@ -1,6 +1,7 @@
 package com.playapp.bff.config;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +44,27 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	/**
+	 * Handle generic exception.
+	 *
+	 * @param ex the ex
+	 * @return the response entity
+	 */
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<BasicErrorResponse> handleGenericException(IllegalArgumentException ex) {
+		BasicErrorResponse errorResponse = BasicErrorResponse.builder().timestamp(LocalDateTime.now())
+				.customizedMessage(ex.getMessage()).build();
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
+	/**
+	 * Handle date time parse exception.
+	 *
+	 * @param ex the ex
+	 * @return the response entity
+	 */
+	@ExceptionHandler(DateTimeParseException.class)
+	public ResponseEntity<BasicErrorResponse> handleDateTimeParseException(DateTimeParseException ex) {
 		BasicErrorResponse errorResponse = BasicErrorResponse.builder().timestamp(LocalDateTime.now())
 				.customizedMessage(ex.getMessage()).build();
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

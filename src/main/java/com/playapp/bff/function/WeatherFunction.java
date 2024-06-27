@@ -23,7 +23,7 @@ public class WeatherFunction implements Function<WeatherFunction.Request, Weathe
 	@JsonClassDescription("Weather API request")
 	public record Request(
 			@JsonProperty(required = true, value = "location") @JsonPropertyDescription("La localizacion, por ejemplo: Cadiz") String location,
-			@JsonProperty(required = true, value = "date") @JsonPropertyDescription("La fecha, por ejemplo: 11/06/2024") String date) {
+			@JsonProperty(required = true, value = "date") @JsonPropertyDescription("La fecha, por ejemplo: 11/06") String date) {
 	}
 
 	/**

@@ -10,7 +10,7 @@ import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 
-import com.playapp.bff.constants.Constants;
+import com.playapp.bff.constants.PromptConstants;
 
 /**
  * The Class UserSession.
@@ -27,7 +27,7 @@ public class UserSession implements Serializable {
 	 * Instantiates a new user session.
 	 */
 	public UserSession() {
-		messageHistory.add(new SystemMessage(Constants.LIMIT_THEMES_SYSTEM_PROMPT));
+		messageHistory.add(new SystemMessage(PromptConstants.LIMIT_THEMES_SYSTEM));
 	}
 
 	/**

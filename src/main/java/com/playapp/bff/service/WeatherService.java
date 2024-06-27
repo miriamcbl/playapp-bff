@@ -9,12 +9,12 @@ import org.springframework.ai.chat.ChatResponse;
 import org.springframework.stereotype.Service;
 
 import com.playapp.bff.bean.LocationCode;
-import com.playapp.bff.constants.Constants;
-import com.playapp.bff.constants.ErrorConstants;
 import com.playapp.bff.constants.GeographicCoordinates;
 import com.playapp.bff.constants.LevanteWind;
+import com.playapp.bff.constants.PromptConstants;
 import com.playapp.bff.mapper.WeatherMapper;
 import com.playapp.bff.service.supplier.AccuWeatherRestService;
+import com.playapp.bff.service.supplier.bean.DailyForecast;
 import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 import com.playapp.bff.util.DateUtils;
@@ -73,14 +73,17 @@ public class WeatherService {
 	 * @return the all beach weathers by location code
 	 */
 	private List<WeatherDetailsResponse> getAllBeachWeathersByLocationCode(List<LocationCode> locationCodes,
-			String dayCode) {
+			String dayCode, int days) {
 		List<WeatherDetailsResponse> weatherDetails = new ArrayList<>();
 		// Se obtiene relacion info del tiempo por cala (lista)
 		locationCodes.parallelStream().forEach(locationCode -> {
 			WeatherDetailsResponse weatherDetailsResponse = accuWeatherRestService.getWeatherDetailsByDays(dayCode,
 					locationCode.getCode());
-			weatherDetailsResponse.setBeachName(locationCode.getName());
-			weatherDetails.add(weatherDetailsResponse);
+			DailyForecast dailyForecast = weatherDetailsResponse.getDailyForecasts().get(days);
+			// Se añade solo el día que indica el usuario
+			WeatherDetailsResponse weatherDetailsResponseFinal = WeatherDetailsResponse.builder()
+					.beachName(locationCode.getName()).dailyForecasts(List.of(dailyForecast)).build();
+			weatherDetails.add(weatherDetailsResponseFinal);
 		});
 		return weatherDetails;
 	}
@@ -141,7 +144,7 @@ public class WeatherService {
 		log.info("start - Beaches comparison");
 		deleteBeachesWithHighWindAndGust(weatherDetails);
 		if (CollectionUtils.isEmpty(weatherDetails)) {
-			return Constants.GUSTS_MESSAGE;
+			return PromptConstants.GUSTS;
 		}
 		List<String> parseDetails = new ArrayList<>();
 		weatherDetails.stream().forEach(details -> {
@@ -150,7 +153,7 @@ public class WeatherService {
 			parseDetails.add("Playa: " + name + ", viento: " + wind + " km/h.");
 		});
 		log.info("Beaches parsed: " + Arrays.toString(parseDetails.toArray()));
-		String message = Constants.OUTPUT_SYSTEM_PROMPT + parseDetails;
+		String message = PromptConstants.OUTPUT_SYSTEM + parseDetails;
 		// Llamar al servicio de chat para obtener y devolver la respuesta
 		ChatResponse comparisonResponse = chatService.getChatResponseByPrompts(message);
 		log.info("end - Beaches comparison result: " + comparisonResponse.getResult().getOutput().getContent());
@@ -212,13 +215,13 @@ public class WeatherService {
 	 * @param dayCodeForPrediction the day code for prediction
 	 * @return the final beaches by direction wind
 	 */
-	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCodeForPrediction) {
+	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCodeForPrediction, int days) {
 		String finalBeaches = null;
 		// Listado con el código asociado a cada playa según AccuWeather
 		List<LocationCode> locationCodes = getLocationCodesByCoordinates();
 		// Se obtiene el tiempo/viento asociado a cada código
 		List<WeatherDetailsResponse> weatherDetails = getAllBeachWeathersByLocationCode(locationCodes,
-				dayCodeForPrediction);
+				dayCodeForPrediction, days);
 		// se comprueba si hoy hay levante en cadiz
 		boolean isLevante = CollectionUtils.isNotEmpty(weatherDetails)
 				? Arrays.stream(LevanteWind.values()).anyMatch(wind -> wind.getShortName().equals(directionWindToday))
@@ -237,10 +240,13 @@ public class WeatherService {
 	public String getBeachesDataByWeather(String date) {
 		String dayCodeForPrediction = null;
 		String finalMessageResult = null;
-		try{
+		if (DateUtils.dateHasYear(date) && DateUtils.isNotThisYear(date)) {
+			return PromptConstants.DATE_ERROR;
+		}
+		try {
 			dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
 		} catch (IllegalArgumentException e) {
-			return ErrorConstants.DATE_ERROR_PROMPT;
+			return PromptConstants.DATE_ERROR;
 		}
 		int days = DateUtils.countDaysFromToday(date);
 		String directionWindToday;
@@ -255,13 +261,13 @@ public class WeatherService {
 				// qué kmh hay hoy
 				kmhWindToday = Math.round(
 						weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getSpeed().getValue());
-				finalMessageResult = kmhWindToday > 30.0 ? Constants.WIND_SUPERIOR_30_MESSAGE
-						: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction);
+				finalMessageResult = kmhWindToday > 30.0 ? PromptConstants.WIND_SUPERIOR_30
+						: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction, days);
 			} else {
-				finalMessageResult = Constants.ITS_RAINING_MESSAGE;
+				finalMessageResult = PromptConstants.ITS_RAINING;
 			}
 		} else {
-			finalMessageResult = Constants.CANNOT_CONNECT_API_MESSAGE;
+			finalMessageResult = PromptConstants.CANNOT_CONNECT_API;
 		}
 		return finalMessageResult;
 	}
