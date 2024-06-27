@@ -2,6 +2,7 @@ package com.playapp.bff.constants;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 /**
  * The Class Constants.
@@ -46,6 +47,11 @@ public class PromptConstants {
 			+ " Si te dice mañana, la fecha es directamente: "
 			+ LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 			+ " Si te preguntan qué necesitas o cómo funcionas, tienes que indicar que necesitas una fecha "
+			+ "Te tienen que indicar el municipio donde se encuentran para poder calcular las mejores opciones. Tiene que "
+			+ "ser entre las siguientes opciones: " + Arrays.toString(CadizTownsGeographicCoordinates.values())
+			+ " y tienes que formatearlo " + "poniendo el municipio en mayúsculas y cambiando los espacios por _"
+			+ " y no pueden darte otros municipios diferentes. "
+			+ "También tienen que indicarte en minutos la duración máxima y mínima que quieren tardar en llegar a la playa en coche"
 			+ "Ten en cuenta estas normas importantes: "
 			+ "Si te preguntan por temas diferentes a las playas en Cádiz, tienes que responder diciendo que no tienes"
 			+ "esa información y que no te crearon para eso. "

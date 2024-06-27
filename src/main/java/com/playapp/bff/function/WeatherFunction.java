@@ -23,7 +23,10 @@ public class WeatherFunction implements Function<WeatherFunction.Request, Weathe
 	@JsonClassDescription("Weather API request")
 	public record Request(
 			@JsonProperty(required = true, value = "location") @JsonPropertyDescription("La localizacion, por ejemplo: Cadiz") String location,
-			@JsonProperty(required = true, value = "date") @JsonPropertyDescription("La fecha, por ejemplo: 11/06") String date) {
+			@JsonProperty(required = true, value = "date") @JsonPropertyDescription("La fecha, por ejemplo: 11/06") String date,
+			@JsonProperty(required = true, value = "origin") @JsonPropertyDescription("El origen, municipio donde se encuentra la persona") String origin,
+			@JsonProperty(required = true, value = "maxDuration") @JsonPropertyDescription("La duración máxima para ir a la playa en coche") int maxDuration,
+			@JsonProperty(required = true, value = "minDuration") @JsonPropertyDescription("La duración mínima para ir a la playa en coche") int minDuration) {
 	}
 
 	/**
@@ -38,7 +41,8 @@ public class WeatherFunction implements Function<WeatherFunction.Request, Weathe
 	@Override
 	public Response apply(Request request) {
 		// llamada al servicio para obtener el tiempo en roche
-		String beaches = weatherService.getBeachesDataByWeather(request.date());
+		String beaches = weatherService.getBeachesDataByWeather(request.date(), request.origin(),
+				request.maxDuration(), request.minDuration());
 		return new Response(beaches);
 	}
 }

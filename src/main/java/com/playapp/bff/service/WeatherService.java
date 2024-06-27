@@ -9,7 +9,8 @@ import org.springframework.ai.chat.ChatResponse;
 import org.springframework.stereotype.Service;
 
 import com.playapp.bff.bean.LocationCode;
-import com.playapp.bff.constants.GeographicCoordinates;
+import com.playapp.bff.constants.BeachesGeographicCoordinates;
+import com.playapp.bff.constants.CadizTownsGeographicCoordinates;
 import com.playapp.bff.constants.LevanteWind;
 import com.playapp.bff.constants.PromptConstants;
 import com.playapp.bff.mapper.WeatherMapper;
@@ -37,18 +38,23 @@ public class WeatherService {
 	/** The chat service. */
 	private ChatService chatService;
 
+	/** The map service. */
+	private MapsService mapService;
+
 	/**
 	 * Instantiates a new weather service.
 	 *
 	 * @param accuWeatherRestService the accu weather rest service
 	 * @param weatherMapper          the weather mapper
 	 * @param chatService            the chat service
+	 * @param mapService             the map service
 	 */
 	public WeatherService(AccuWeatherRestService accuWeatherRestService, WeatherMapper weatherMapper,
-			ChatService chatService) {
+			ChatService chatService, MapsService mapService) {
 		this.accuWeatherRestService = accuWeatherRestService;
 		this.weatherMapper = weatherMapper;
 		this.chatService = chatService;
+		this.mapService = mapService;
 	}
 
 	/**
@@ -56,12 +62,12 @@ public class WeatherService {
 	 *
 	 * @return the location codes by coordinates
 	 */
-	private List<LocationCode> getLocationCodesByCoordinates() {
+	private List<LocationCode> getLocationCodesByCoordinates(List<BeachesGeographicCoordinates> beaches) {
 		List<LocationCode> locationsKeys = new ArrayList<>();
-		Arrays.asList(GeographicCoordinates.values()).parallelStream().forEach(coordinates -> {
-			LocationResponse locationResponse = accuWeatherRestService.getLocations(coordinates.getLatitude(),
-					coordinates.getLongitude());
-			locationsKeys.add(weatherMapper.mapToLocationCode(coordinates.name(), locationResponse.getKey()));
+		beaches.parallelStream().forEach(beach -> {
+			LocationResponse locationResponse = accuWeatherRestService.getLocations(beach.getLatitude(),
+					beach.getLongitude());
+			locationsKeys.add(weatherMapper.mapToLocationCode(beach.name(), locationResponse.getKey()));
 		});
 		return locationsKeys;
 	}
@@ -126,7 +132,7 @@ public class WeatherService {
 	private String getLevanteBeaches(List<WeatherDetailsResponse> weatherDetails) {
 		String finalLevanteBeaches = null;
 		// se obtiene listado de todas las playas aptas para levante
-		List<GeographicCoordinates> levanteBeaches = Arrays.asList(GeographicCoordinates.values()).stream()
+		List<BeachesGeographicCoordinates> levanteBeaches = Arrays.asList(BeachesGeographicCoordinates.values()).stream()
 				.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante())).toList();
 		// del listado de todos los weatherDetails de cada playa, nos quedamos con
 		// aquellos cuyo nombre esté indicado en el resultado del filtrado anterior que
@@ -164,7 +170,7 @@ public class WeatherService {
 	private boolean itHasSpecialCondition(WeatherDetailsResponse weatherDetail) {
 		// Si la playa es "Tarifa, Bolonia..." el km/h del
 		// windGust debe ser menor
-		return Arrays.stream(GeographicCoordinates.values()).anyMatch(
+		return Arrays.stream(BeachesGeographicCoordinates.values()).anyMatch(
 				beach -> beach.name().equals(weatherDetail.getBeachName()) && beach.getSpecialConditionForWindGust());
 	}
 
@@ -208,6 +214,8 @@ public class WeatherService {
 		}
 	}
 
+
+
 	/**
 	 * Gets the final beaches by direction wind.
 	 *
@@ -215,10 +223,15 @@ public class WeatherService {
 	 * @param dayCodeForPrediction the day code for prediction
 	 * @return the final beaches by direction wind
 	 */
-	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCodeForPrediction, int days) {
+	private String getFinalBeachesByDirectionWind(String directionWindToday, String dayCodeForPrediction, int days,
+			String originLatLon, int maxDuration, int minDuration) {
 		String finalBeaches = null;
+		// Filtramos primero de todas las playas las que cumplen condición de duración
+		// por el usuario
+		List<BeachesGeographicCoordinates> beaches = mapService.getBeachesWithDurationConditions(originLatLon,
+				maxDuration, minDuration);
 		// Listado con el código asociado a cada playa según AccuWeather
-		List<LocationCode> locationCodes = getLocationCodesByCoordinates();
+		List<LocationCode> locationCodes = getLocationCodesByCoordinates(beaches);
 		// Se obtiene el tiempo/viento asociado a cada código
 		List<WeatherDetailsResponse> weatherDetails = getAllBeachWeathersByLocationCode(locationCodes,
 				dayCodeForPrediction, days);
@@ -237,9 +250,11 @@ public class WeatherService {
 	 * @param date the date
 	 * @return the beaches data by weather
 	 */
-	public String getBeachesDataByWeather(String date) {
+	public String getBeachesDataByWeather(String date, String origin, int maxDuration, int minDuration) {
 		String dayCodeForPrediction = null;
 		String finalMessageResult = null;
+		String originLatLon = CadizTownsGeographicCoordinates.valueOf(origin).getLatitude() + ","
+				+ CadizTownsGeographicCoordinates.valueOf(origin).getLongitude();
 		if (DateUtils.dateHasYear(date) && DateUtils.isNotThisYear(date)) {
 			return PromptConstants.DATE_ERROR;
 		}
@@ -262,7 +277,8 @@ public class WeatherService {
 				kmhWindToday = Math.round(
 						weatherDetailsCadiz.getDailyForecasts().get(days).getDay().getWind().getSpeed().getValue());
 				finalMessageResult = kmhWindToday > 30.0 ? PromptConstants.WIND_SUPERIOR_30
-						: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction, days);
+						: getFinalBeachesByDirectionWind(directionWindToday, dayCodeForPrediction, days, originLatLon,
+								maxDuration, minDuration);
 			} else {
 				finalMessageResult = PromptConstants.ITS_RAINING;
 			}

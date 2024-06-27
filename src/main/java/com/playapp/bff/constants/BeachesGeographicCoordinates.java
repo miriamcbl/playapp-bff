@@ -3,7 +3,7 @@ package com.playapp.bff.constants;
 /**
  * The Enum GeographicCoordinates.
  */
-public enum GeographicCoordinates {
+public enum BeachesGeographicCoordinates {
 	
 	PLAYA_LA_CALETA("36.530508", "-6.305878", true, false),
 	PLAYA_SANTA_MARIA_DEL_MAR("36.520222", "-6.287010", true, false),
@@ -79,6 +79,15 @@ public enum GeographicCoordinates {
 	}
 
 	/**
+	 * Gets the lat lon.
+	 *
+	 * @return the lat lon
+	 */
+	public String getLatLon() {
+		return latitude + "," + longitude;
+	}
+
+	/**
 	 * Instantiates a new geographic coordinates.
 	 *
 	 * @param latitude                    the latitude
@@ -86,7 +95,7 @@ public enum GeographicCoordinates {
 	 * @param suitableForLevante          the suitable for levante
 	 * @param specialConditionForWindGust the special condition for wind gust
 	 */
-	private GeographicCoordinates(String latitude, String longitude, Boolean suitableForLevante,
+	private BeachesGeographicCoordinates(String latitude, String longitude, Boolean suitableForLevante,
 			Boolean specialConditionForWindGust) {
 		this.latitude = latitude;
 		this.longitude = longitude;
