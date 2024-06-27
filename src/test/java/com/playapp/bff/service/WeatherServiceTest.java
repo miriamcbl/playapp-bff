@@ -73,7 +73,7 @@ class WeatherServiceTest {
 												.speed(WindSpeed.builder().value(40.0).build()).build())
 										.build()).build()))
 								.build());
-		assertNotNull(service.getBeachesDataByWeather(today, "", 0, 10));
+		assertNotNull(service.getBeachesDataByWeather(today, "CHICLANA", 0, 10));
 	}
 
 	@Test
