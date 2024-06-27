@@ -29,4 +29,7 @@ public class ErrorConstants {
 
 	/** The Constant PROMPTS_OPTIONS_SYSTEM_ERROR. */
 	public static final String PROMPTS_OPTIONS_SYSTEM_ERROR = "Error al llamar a chat usando Prompts y Options";
+
+	/** The Constant DISTANCES_ERROR. */
+	public static final String DISTANCES_ERROR = "Error al obtener las distancias entre las localizaciones";
 }

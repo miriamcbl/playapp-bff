@@ -3,10 +3,14 @@ package com.playapp.bff.service.supplier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.playapp.bff.config.ErrorHandler;
+import com.playapp.bff.constants.ErrorConstants;
 import com.playapp.bff.service.supplier.bean.DistanceMatrixResponse;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -41,6 +45,7 @@ public class GoogleMapsRestService extends WebClientService {
 	 * @param destination the destination
 	 * @return the distance
 	 */
+	@CircuitBreaker(name = "playapp", fallbackMethod = "getDistanceFallback")
 	public DistanceMatrixResponse getDistance(String origin, String destination) {
 		log.info("Begin - getDistance");
 		UriComponentsBuilder builder = UriComponentsBuilder
@@ -53,5 +58,18 @@ public class GoogleMapsRestService extends WebClientService {
 				.bodyToMono(DistanceMatrixResponse.class).block();
 		log.info("End - getDistance");
 		return distanceResponse;
+	}
+
+	/**
+	 * Gets the distance fallback.
+	 *
+	 * @param origin      the origin
+	 * @param destination the destination
+	 * @param exception   the exception
+	 * @return the distance fallback
+	 */
+	protected DistanceMatrixResponse getDistanceFallback(String origin, String destination,
+			WebClientResponseException exception) {
+		throw ErrorHandler.webClientHandleErrorResponse(exception, ErrorConstants.DISTANCES_ERROR);
 	}
 }
