@@ -23,6 +23,10 @@ import com.playapp.bff.mapper.WeatherMapper;
 import com.playapp.bff.service.supplier.AccuWeatherRestService;
 import com.playapp.bff.service.supplier.bean.DailyForecast;
 import com.playapp.bff.service.supplier.bean.DayDetails;
+import com.playapp.bff.service.supplier.bean.DistanceMatrixElement;
+import com.playapp.bff.service.supplier.bean.DistanceMatrixResponse;
+import com.playapp.bff.service.supplier.bean.DistanceMatrixRow;
+import com.playapp.bff.service.supplier.bean.Duration;
 import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
 import com.playapp.bff.service.supplier.bean.Wind;
@@ -39,6 +43,10 @@ class WeatherServiceTest {
 
 	@Mock
 	private ChatService chatService;
+
+	/** The maps service. */
+	@Mock
+	private MapsService mapsService;
 
 	@InjectMocks
 	private WeatherService service;
@@ -65,11 +73,17 @@ class WeatherServiceTest {
 												.speed(WindSpeed.builder().value(40.0).build()).build())
 										.build()).build()))
 								.build());
-		assertNotNull(service.getBeachesDataByWeather(today));
+		assertNotNull(service.getBeachesDataByWeather(today, "CHICLANA", 0, 10));
 	}
 
 	@Test
 	void getBeachesDataTest() {
+		when(mapsService.getDistance(Mockito.anyString(), Mockito.anyString()))
+				.thenReturn(DistanceMatrixResponse.builder().rows(List.of(
+						DistanceMatrixRow.builder().elements(List.of(
+								DistanceMatrixElement.builder().duration(Duration.builder().value(5).build()).build()))
+								.build()))
+						.build());
 		Generation generation = new Generation("");
 		ChatResponse chatResponse = new ChatResponse(List.of(generation));
 		when(chatService.getChatResponseByPrompts(anyString())).thenReturn(chatResponse);
@@ -93,11 +107,18 @@ class WeatherServiceTest {
 				.dailyForecasts(forecasts).build();
 		when(accuWeatherRestService.getWeatherDetailsByDays(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(responseWeather);
-		assertNotNull(service.getBeachesDataByWeather(today));
+		assertNotNull(service.getBeachesDataByWeather(today, "CHICLANA", 0, 10));
 	}
 
 	@Test
 	void getBeachesDataTest2() {
+		when(mapsService.getDistance(Mockito.anyString(), Mockito.anyString())).thenReturn(DistanceMatrixResponse
+				.builder()
+				.rows(List.of(DistanceMatrixRow.builder()
+						.elements(List.of(
+								DistanceMatrixElement.builder().duration(Duration.builder().value(5).build()).build()))
+						.build()))
+				.build());
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
 		Generation generation = new Generation("");
@@ -121,11 +142,18 @@ class WeatherServiceTest {
 				.dailyForecasts(forecasts).build();
 		when(accuWeatherRestService.getWeatherDetailsByDays(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(responseWeather);
-		assertNotNull(service.getBeachesDataByWeather(today));
+		assertNotNull(service.getBeachesDataByWeather(today, "CHICLANA", 0, 10));
 	}
 
 	@Test
 	void getBeachesDataTest3() {
+		when(mapsService.getDistance(Mockito.anyString(), Mockito.anyString())).thenReturn(DistanceMatrixResponse
+				.builder()
+				.rows(List.of(DistanceMatrixRow.builder()
+						.elements(List.of(
+								DistanceMatrixElement.builder().duration(Duration.builder().value(5).build()).build()))
+						.build()))
+				.build());
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
@@ -133,11 +161,18 @@ class WeatherServiceTest {
 		when(weatherMapper.mapToLocationCode(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(LocationCode.builder().code("213").name("playa").build());
 		when(accuWeatherRestService.getWeatherDetailsByDays(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
-		assertNotNull(service.getBeachesDataByWeather(today));
+		assertNotNull(service.getBeachesDataByWeather(today, "CHICLANA", 0, 10));
 	}
 
 	@Test
 	void getBeachesDataItsRainingTest4() {
+		when(mapsService.getDistance(Mockito.anyString(), Mockito.anyString())).thenReturn(DistanceMatrixResponse
+				.builder()
+				.rows(List.of(DistanceMatrixRow.builder()
+						.elements(List.of(
+								DistanceMatrixElement.builder().duration(Duration.builder().value(5).build()).build()))
+						.build()))
+				.build());
 		when(accuWeatherRestService.getLocations(Mockito.any(), Mockito.any()))
 				.thenReturn(LocationResponse.builder().key("12").build());
 		Generation generation = new Generation("");
@@ -155,11 +190,18 @@ class WeatherServiceTest {
 				.dailyForecasts(forecasts).build();
 		when(accuWeatherRestService.getWeatherDetailsByDays(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(responseWeather);
-		assertNotNull(service.getBeachesDataByWeather(today));
+		assertNotNull(service.getBeachesDataByWeather(today, "CHICLANA", 0, 10));
 	}
 
 	@Test
 	void getBeachesDataSpecialConditionTest5() {
+		when(mapsService.getDistance(Mockito.anyString(), Mockito.anyString())).thenReturn(DistanceMatrixResponse
+				.builder()
+				.rows(List.of(DistanceMatrixRow.builder()
+						.elements(List.of(
+								DistanceMatrixElement.builder().duration(Duration.builder().value(5).build()).build()))
+						.build()))
+				.build());
 		Generation generation = new Generation("");
 		ChatResponse chatResponse = new ChatResponse(List.of(generation));
 		when(chatService.getChatResponseByPrompts(anyString())).thenReturn(chatResponse);
@@ -181,7 +223,7 @@ class WeatherServiceTest {
 				.dailyForecasts(forecasts).build();
 		when(accuWeatherRestService.getWeatherDetailsByDays(Mockito.anyString(), Mockito.anyString()))
 				.thenReturn(responseWeather);
-		assertNotNull(service.getBeachesDataByWeather(today));
+		assertNotNull(service.getBeachesDataByWeather(today, "CHICLANA", 0, 10));
 	}
 
 }

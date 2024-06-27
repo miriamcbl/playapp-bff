@@ -28,9 +28,10 @@ class WeatherFunctionTest {
 
 	@Test
 	void applyTest() {
-		when(weatherService.getBeachesDataByWeather(Mockito.anyString()))
+		when(weatherService.getBeachesDataByWeather(Mockito.anyString(), Mockito.anyString(),
+				Mockito.anyInt(), Mockito.anyInt()))
 				.thenReturn("");
-		assertNotNull(weatherFunction.apply(new Request("test", "test")));
+		assertNotNull(weatherFunction.apply(new Request("test", "test", "test", 10, 30)));
 	}
 
 }

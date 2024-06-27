@@ -15,7 +15,8 @@ pipeline {
         PLAYAPP_EC2 = credentials('playapp_ec2')
         OPENAI_API_KEY = credentials('openai-api-key')
         ACCUWEATHER_API_KEY = credentials('accuweather-api-key')
-        PLAYAPP_EC2_FNT = credentials('playapp_ec2_fnt')        
+        PLAYAPP_EC2_FNT = credentials('playapp_ec2_fnt')  
+        GMAPS_API_KEY = credentials('gmaps-api-key')      
     }
     tools {
         // Utiliza maven instalado en la maquina
@@ -107,6 +108,7 @@ pipeline {
 		            propertiesFile = propertiesFile.replaceAll('spring.ai.openai.api-key: your_api_key', "spring.ai.openai.api-key: ${OPENAI_API_KEY}")
 		            propertiesFile = propertiesFile.replaceAll('accuweather.apikey: your_api_key', "accuweather.apikey: ${ACCUWEATHER_API_KEY}")
 					propertiesFile = propertiesFile.replaceAll('cors.allowed.origins: your_front_ip', "cors.allowed.origins: http://${PLAYAPP_EC2_FNT}")
+		            propertiesFile = propertiesFile.replaceAll('googlemaps.apikey: your_api_key', "googlemaps.apikey: ${GMAPS_API_KEY}")
 		            
 		            // se escribe todo
 		            writeFile file: propertiesDir, text: propertiesFile
