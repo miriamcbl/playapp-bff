@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-import com.playapp.bff.constants.Constants;
+import com.playapp.bff.constants.PromptConstants;
 import com.playapp.bff.constants.ErrorConstants;
 
 public class DateUtils {
@@ -25,10 +25,10 @@ public class DateUtils {
 		LocalDate today = LocalDate.now();
 		LocalDate fiveDaysLater = today.plusDays(5);
 		if (today.toString().equals(dateFormatted.toString())) {
-			return Constants.ONE_DAY_PREDICTION;
+			return PromptConstants.ONE_DAY_PREDICTION;
 		} else {
 			if (!dateFormatted.isBefore(today) && !dateFormatted.isAfter(fiveDaysLater)) {
-				return Constants.FIVE_DAYS_PREDICTION;
+				return PromptConstants.FIVE_DAYS_PREDICTION;
 			} else {
 				throw new IllegalArgumentException(
 						ErrorConstants.DATE_ERROR);

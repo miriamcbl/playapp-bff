@@ -9,10 +9,6 @@ public class ErrorConstants {
 	/** The Constant DATE_ERROR. */
 	public static final String DATE_ERROR = "La fecha no puede ser anterior al día de hoy ni posterior a 5 días";
 
-	/** The Constant DATE_ERROR_PROMPT. */
-	public static final String DATE_ERROR_PROMPT = "La fecha no es correcta. La fecha no puede ser anterior al día "
-			+ "de hoy ni posterior a 5 días. Además tiene que tener el formato correcto: dd/mm/aaaa.";
-
 	/** The Constant DAYS_ERROR. */
 	public static final String DAYS_ERROR = "No se puede manejar total de días superior a 5";
 

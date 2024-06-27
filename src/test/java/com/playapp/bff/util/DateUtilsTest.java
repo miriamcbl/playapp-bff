@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.Test;
 
-import com.playapp.bff.constants.Constants;
+import com.playapp.bff.constants.PromptConstants;
 import com.playapp.bff.constants.ErrorConstants;
 
 class DateUtilsTest {
@@ -17,7 +17,7 @@ class DateUtilsTest {
 	void getDaysForAccuWeatherPredictionTodayTest() {
 		LocalDate today = LocalDate.now();
 		String todayStr = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		assertEquals(Constants.ONE_DAY_PREDICTION, DateUtils.getDaysForAccuWeatherPrediction(todayStr));
+		assertEquals(PromptConstants.ONE_DAY_PREDICTION, DateUtils.getDaysForAccuWeatherPrediction(todayStr));
 	}
 
 	@Test
@@ -25,7 +25,7 @@ class DateUtilsTest {
 		LocalDate today = LocalDate.now();
 		LocalDate withinFiveDays = today.plusDays(3);
 		String withinFiveDaysStr = withinFiveDays.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		assertEquals(Constants.FIVE_DAYS_PREDICTION, DateUtils.getDaysForAccuWeatherPrediction(withinFiveDaysStr));
+		assertEquals(PromptConstants.FIVE_DAYS_PREDICTION, DateUtils.getDaysForAccuWeatherPrediction(withinFiveDaysStr));
 	}
 
 	@Test
