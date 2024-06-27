@@ -8,16 +8,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DistanceMatrixResponse.
  */
 @Getter
 @Setter
-
-/**
- * The Class DistanceMatrixResponseBuilder.
- */
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
