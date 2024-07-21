@@ -3,9 +3,13 @@ package com.playapp.bff.util;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import com.playapp.bff.constants.PromptConstants;
+import com.playapp.bff.constants.CadizTownsGeographicCoordinates;
 import com.playapp.bff.constants.ErrorConstants;
+import com.playapp.bff.constants.PromptConstants;
 
 public class DateUtils {
 
@@ -76,6 +80,15 @@ public class DateUtils {
 
 	public static String addActualYear(String date) {
 		return date + "/" + String.valueOf(LocalDate.now().getYear());
+	}
+
+	public static List<String> getFormattedBeaches() {
+		List<String> names = new ArrayList<>();
+		Arrays.asList(CadizTownsGeographicCoordinates.values()).stream().forEach(beach -> {
+			String name = beach.name().replaceAll("_", " ");
+			names.add(name);
+		});
+		return names;
 	}
 
 }
