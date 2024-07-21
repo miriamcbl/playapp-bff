@@ -253,8 +253,8 @@ public class WeatherService {
 	public String getBeachesDataByWeather(String date, String origin, int maxDuration, int minDuration) {
 		String dayCodeForPrediction = null;
 		String finalMessageResult = null;
-		String originLatLon = CadizTownsGeographicCoordinates.valueOf(origin).getLatitude() + ","
-				+ CadizTownsGeographicCoordinates.valueOf(origin).getLongitude();
+		String originLatLon = CadizTownsGeographicCoordinates.valueOf(origin.toUpperCase()).getLatitude() + ","
+				+ CadizTownsGeographicCoordinates.valueOf(origin.toUpperCase()).getLongitude();
 		if (DateUtils.dateHasYear(date) && DateUtils.isNotThisYear(date)) {
 			return PromptConstants.DATE_ERROR;
 		}
