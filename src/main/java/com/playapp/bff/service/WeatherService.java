@@ -3,6 +3,7 @@ package com.playapp.bff.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.ai.chat.ChatResponse;
@@ -133,14 +134,14 @@ public class WeatherService {
 		String finalLevanteBeaches = null;
 		// se obtiene listado de todas las playas aptas para levante
 		List<BeachesGeographicCoordinates> levanteBeaches = Arrays.asList(BeachesGeographicCoordinates.values()).stream()
-				.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante())).toList();
+				.filter(beach -> Boolean.TRUE.equals(beach.getSuitableForLevante())).collect(Collectors.toList());
 		// del listado de todos los weatherDetails de cada playa, nos quedamos con
 		// aquellos cuyo nombre esté indicado en el resultado del filtrado anterior que
 		// corresponde a las playas aptas para viento levante
 		List<WeatherDetailsResponse> weatherDetailsForLevanteBeaches = weatherDetails.stream()
 				.filter(weatherBeach -> levanteBeaches.stream()
 						.anyMatch(levanteBeach -> levanteBeach.name().equals(weatherBeach.getBeachName())))
-				.toList();
+				.collect(Collectors.toList());
 		// ordenamos las tres mejores opciones
 		finalLevanteBeaches = sortAndLimitFinalBeaches(weatherDetailsForLevanteBeaches);
 		return finalLevanteBeaches;
@@ -194,6 +195,7 @@ public class WeatherService {
 				}
 			});
 		}
+		//falla aquí cuando tiene por ejemplo 1 playa solo y da un unsoportedOperation
 		if (CollectionUtils.isNotEmpty(weatherDetailsWithHighWindAndGust)) {
 			weatherDetails.removeAll(weatherDetailsWithHighWindAndGust);
 		}
