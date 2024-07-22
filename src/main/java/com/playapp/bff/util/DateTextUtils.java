@@ -14,6 +14,8 @@ import com.playapp.bff.constants.PromptConstants;
 
 public class DateTextUtils {
 
+	private static final String datePattern = "dd/MM/yyyy";
+
 	private DateTextUtils() {
 		super();
 	}
@@ -25,7 +27,7 @@ public class DateTextUtils {
 	 * @return the days for accu weather prediction
 	 */
 	public static String getDaysForAccuWeatherPrediction(String date) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern);
 		LocalDate dateFormatted = LocalDate.parse(date, formatter);
 		LocalDate today = LocalDate.now();
 		LocalDate fiveDaysLater = today.plusDays(5);
@@ -48,7 +50,7 @@ public class DateTextUtils {
 	 * @return the int
 	 */
 	public static int countDaysFromToday(String date) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern);
 		LocalDate dateFormatted = LocalDate.parse(date, formatter);
 		LocalDate today = LocalDate.now();
 		if (dateFormatted.isBefore(today)) {
@@ -68,7 +70,7 @@ public class DateTextUtils {
 	 * @return true, if is this year
 	 */
 	public static boolean isNotThisYear(String date) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern);
 		LocalDate dateFormatted = LocalDate.parse(date, formatter);
 		int actualYear = LocalDate.now().getYear();
 		int yearDateFormatted = dateFormatted.getYear();
