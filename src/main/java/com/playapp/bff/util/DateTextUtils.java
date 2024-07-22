@@ -1,5 +1,6 @@
 package com.playapp.bff.util;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -11,9 +12,9 @@ import com.playapp.bff.constants.CadizTownsGeographicCoordinates;
 import com.playapp.bff.constants.ErrorConstants;
 import com.playapp.bff.constants.PromptConstants;
 
-public class DateUtils {
+public class DateTextUtils {
 
-	private DateUtils() {
+	private DateTextUtils() {
 		super();
 	}
 
@@ -74,14 +75,31 @@ public class DateUtils {
 		return actualYear != yearDateFormatted;
 	}
 
+	/**
+	 * Date has year.
+	 *
+	 * @param date the date
+	 * @return true, if successful
+	 */
 	public static boolean dateHasYear(String date) {
 		return date.length() > 6 && date.length() <= 10;
 	}
 
+	/**
+	 * Adds the actual year.
+	 *
+	 * @param date the date
+	 * @return the string
+	 */
 	public static String addActualYear(String date) {
 		return date + "/" + String.valueOf(LocalDate.now().getYear());
 	}
 
+	/**
+	 * Gets the formatted beaches.
+	 *
+	 * @return the formatted beaches
+	 */
 	public static List<String> getFormattedBeaches() {
 		List<String> names = new ArrayList<>();
 		Arrays.asList(CadizTownsGeographicCoordinates.values()).stream().forEach(beach -> {
@@ -89,6 +107,16 @@ public class DateUtils {
 			names.add(name);
 		});
 		return names;
+	}
+
+	/**
+	 * Normalize text.
+	 *
+	 * @param text the text
+	 * @return the string
+	 */
+	public static String normalizeText(String text) {
+		return Normalizer.normalize(text, Normalizer.Form.NFD).replaceAll("[\u0300-\u0301]", "");
 	}
 
 }
