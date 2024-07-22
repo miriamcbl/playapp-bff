@@ -3,7 +3,7 @@ package com.playapp.bff.constants;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import com.playapp.bff.util.DateUtils;
+import com.playapp.bff.util.DateTextUtils;
 
 /**
  * The Class Constants.
@@ -51,7 +51,7 @@ public class PromptConstants {
 			+ " Si te dice mañana, la fecha tienes que formatearla a dia mes y año y es directamente de esta forma: "
 			+ LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 			+ "Te tienen que indicar el municipio donde se encuentran para poder calcular las mejores opciones. Tiene que "
-			+ "ser entre las siguientes opciones: " + DateUtils.getFormattedBeaches()
+			+ "ser entre las siguientes opciones: " + DateTextUtils.getFormattedBeaches()
 			+ " y no pueden darte otros municipios diferentes. "
 			+ "También tienen que indicarte en minutos la duración máxima y mínima que quieren tardar en llegar a la playa en coche"
 			+ "Ten en cuenta estas normas importantes: "

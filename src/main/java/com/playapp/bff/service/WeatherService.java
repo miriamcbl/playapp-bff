@@ -18,7 +18,7 @@ import com.playapp.bff.service.supplier.AccuWeatherRestService;
 import com.playapp.bff.service.supplier.bean.DailyForecast;
 import com.playapp.bff.service.supplier.bean.LocationResponse;
 import com.playapp.bff.service.supplier.bean.WeatherDetailsResponse;
-import com.playapp.bff.util.DateUtils;
+import com.playapp.bff.util.DateTextUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -253,17 +253,18 @@ public class WeatherService {
 	public String getBeachesDataByWeather(String date, String origin, int maxDuration, int minDuration) {
 		String dayCodeForPrediction = null;
 		String finalMessageResult = null;
-		String originLatLon = CadizTownsGeographicCoordinates.valueOf(origin.toUpperCase()).getLatitude() + ","
-				+ CadizTownsGeographicCoordinates.valueOf(origin.toUpperCase()).getLongitude();
-		if (DateUtils.dateHasYear(date) && DateUtils.isNotThisYear(date)) {
+		String originNormalize = DateTextUtils.normalizeText(origin);
+		String originLatLon = CadizTownsGeographicCoordinates.valueOf(originNormalize.toUpperCase()).getLatitude() + ","
+				+ CadizTownsGeographicCoordinates.valueOf(originNormalize.toUpperCase()).getLongitude();
+		if (DateTextUtils.dateHasYear(date) && DateTextUtils.isNotThisYear(date)) {
 			return PromptConstants.DATE_ERROR;
 		}
 		try {
-			dayCodeForPrediction = DateUtils.getDaysForAccuWeatherPrediction(date);
+			dayCodeForPrediction = DateTextUtils.getDaysForAccuWeatherPrediction(date);
 		} catch (IllegalArgumentException e) {
 			return PromptConstants.DATE_ERROR;
 		}
-		int days = DateUtils.countDaysFromToday(date);
+		int days = DateTextUtils.countDaysFromToday(date);
 		String directionWindToday;
 		double kmhWindToday;
 		// Se obtiene el tiempo y viento actual en la provincia de Cádiz

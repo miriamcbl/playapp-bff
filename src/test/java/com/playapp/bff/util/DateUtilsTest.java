@@ -17,7 +17,7 @@ class DateUtilsTest {
 	void getDaysForAccuWeatherPredictionTodayTest() {
 		LocalDate today = LocalDate.now();
 		String todayStr = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		assertEquals(PromptConstants.ONE_DAY_PREDICTION, DateUtils.getDaysForAccuWeatherPrediction(todayStr));
+		assertEquals(PromptConstants.ONE_DAY_PREDICTION, DateTextUtils.getDaysForAccuWeatherPrediction(todayStr));
 	}
 
 	@Test
@@ -25,7 +25,7 @@ class DateUtilsTest {
 		LocalDate today = LocalDate.now();
 		LocalDate withinFiveDays = today.plusDays(3);
 		String withinFiveDaysStr = withinFiveDays.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		assertEquals(PromptConstants.FIVE_DAYS_PREDICTION, DateUtils.getDaysForAccuWeatherPrediction(withinFiveDaysStr));
+		assertEquals(PromptConstants.FIVE_DAYS_PREDICTION, DateTextUtils.getDaysForAccuWeatherPrediction(withinFiveDaysStr));
 	}
 
 	@Test
@@ -34,7 +34,7 @@ class DateUtilsTest {
 		LocalDate beyondFiveDays = today.plusDays(6);
 		String beyondFiveDaysStr = beyondFiveDays.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			DateUtils.getDaysForAccuWeatherPrediction(beyondFiveDaysStr);
+			DateTextUtils.getDaysForAccuWeatherPrediction(beyondFiveDaysStr);
 		});
 		assertEquals(ErrorConstants.DATE_ERROR, exception.getMessage());
 	}
@@ -45,7 +45,7 @@ class DateUtilsTest {
 		LocalDate pastDate = today.minusDays(1);
 		String pastDateStr = pastDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			DateUtils.getDaysForAccuWeatherPrediction(pastDateStr);
+			DateTextUtils.getDaysForAccuWeatherPrediction(pastDateStr);
 		});
 		assertEquals(ErrorConstants.DATE_ERROR, exception.getMessage());
 	}
@@ -55,7 +55,7 @@ class DateUtilsTest {
 		LocalDate today = LocalDate.now();
 		LocalDate futureDate = today.plusDays(3);
 		String futureDateStr = futureDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		assertEquals(3, DateUtils.countDaysFromToday(futureDateStr));
+		assertEquals(3, DateTextUtils.countDaysFromToday(futureDateStr));
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class DateUtilsTest {
 		LocalDate pastDate = today.minusDays(1);
 		String pastDateStr = pastDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			DateUtils.countDaysFromToday(pastDateStr);
+			DateTextUtils.countDaysFromToday(pastDateStr);
 		});
 		assertEquals(ErrorConstants.DATE_ERROR, exception.getMessage());
 	}
@@ -75,7 +75,7 @@ class DateUtilsTest {
 		LocalDate beyondFiveDays = today.plusDays(6);
 		String beyondFiveDaysStr = beyondFiveDays.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			DateUtils.countDaysFromToday(beyondFiveDaysStr);
+			DateTextUtils.countDaysFromToday(beyondFiveDaysStr);
 		});
 		assertEquals(ErrorConstants.DAYS_ERROR, exception.getMessage());
 	}
